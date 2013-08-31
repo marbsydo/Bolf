@@ -8,8 +8,17 @@ public class GameControls : MonoBehaviour {
 	Ball ball;
 	BallStage ballStage = BallStage.DoesNotExist;
 
+	Vector3[] markers;
+	Vector3 markersMid;
+
 	void Awake() {
 		ballPrefab = Resources.Load("Ball");
+
+		// Find the two markers
+		markers = new Vector3[2];
+		markers[0] = GameObject.Find("BallMarkerLeft").transform.position;
+		markers[1] = GameObject.Find("BallMarkerRight").transform.position;
+		markersMid = markers[0] + (markers[1] - markers[0]) / 2;
 	}
 
 	void Start() {
@@ -19,6 +28,15 @@ public class GameControls : MonoBehaviour {
 	void Update() {
 		if (ballStage == BallStage.AwaitingRelease) {
 			// Move ball left/right with touch
+			if (Input.GetMouseButton(0)) {
+				Vector3 t = ball.transform.position;
+				t.x = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -Camera.main.transform.position.z)).x;
+				if (t.x < markers[0].x)
+					t.x = markers[0].x;
+				if (t.x > markers[1].x)
+					t.x = markers[1].x;
+				ball.transform.position = t;
+			}
 		}
 	}
 
@@ -26,14 +44,8 @@ public class GameControls : MonoBehaviour {
 		// Delete existing ball
 		DestroyBall();
 
-		// Find the two markers
-		Vector3[] markers = new Vector3[2];
-		markers[0] = GameObject.Find("BallMarkerLeft").transform.position;
-		markers[1] = GameObject.Find("BallMarkerRight").transform.position;
-		Vector3 midPoint = markers[0] + (markers[1] - markers[0]) / 2;
-
 		// Create the new ball
-		CreateBall(midPoint);
+		CreateBall(markersMid);
 	}
 
 	void CreateBall(Vector3 p) {
