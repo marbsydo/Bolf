@@ -2,7 +2,18 @@ using UnityEngine;
 using System.Collections;
 
 public class GameControls : MonoBehaviour {
+	Object ballPrefab;
+	Ball ball;
 
+	void Awake() {
+		ballPrefab = Resources.Load("Ball");
+	}
+
+	void Start() {
+		ball = (Instantiate(ballPrefab, Vector3.zero, Quaternion.identity) as GameObject).AddComponent<Ball>();
+	}
+
+/*
 	Ball ball;
 
 	void Start() {
@@ -28,4 +39,5 @@ public class GameControls : MonoBehaviour {
 		Vector2 diff = touchPosWorld - (Vector2)ball.transform.position;
 		ball.Roll(diff);
 	}
+*/
 }
