@@ -12,7 +12,6 @@ public class GameControls : MonoBehaviour {
 
 	Vector3[] markers;
 	Vector3 markersMid;
-	float markersLine;
 
 	float swipeTimeStart;
 	Vector3 swipeFrom;
@@ -26,7 +25,7 @@ public class GameControls : MonoBehaviour {
 		markers[0] = GameObject.Find("BallMarkerLeft").transform.position;
 		markers[1] = GameObject.Find("BallMarkerRight").transform.position;
 		markersMid = markers[0] + (markers[1] - markers[0]) / 2;
-		markersLine = markersMid.y + 1.5f;
+		//markersLine = markersMid.y + 1.5f;
 	}
 
 	void Start() {
@@ -39,10 +38,18 @@ public class GameControls : MonoBehaviour {
 			Vector3 m, ms;
 
 			if (Input.GetMouseButtonDown(0)) {
+				m = Input.mousePosition;
+				ms = Camera.main.ScreenToWorldPoint(new Vector3(m.x, m.y, -Camera.main.transform.position.z));
+
 				if (releaseStage == ReleaseStage.Released) {
 					// DEBUGGING: reset ball when touch after released
 					ResetBall();
 					releaseStage = ReleaseStage.NoInput;
+				}
+				if (releaseStage == ReleaseStage.NoInput) {
+					if ((ms - ball.transform.position).magnitude < 2f) {
+						releaseStage = ReleaseStage.MovingBallSideways;
+					}
 				}
 			}
 
@@ -50,22 +57,20 @@ public class GameControls : MonoBehaviour {
 				m = Input.mousePosition;
 				ms = Camera.main.ScreenToWorldPoint(new Vector3(m.x, m.y, -Camera.main.transform.position.z));
 
+				if (releaseStage == ReleaseStage.MovingBallSideways) {
+					Vector3 t = ball.transform.position;
+					t.x = ms.x;
+					if (t.x < markers[0].x)
+						t.x = markers[0].x;
+					if (t.x > markers[1].x)
+						t.x = markers[1].x;
+					ball.transform.position = t;
+				}
+
 				if (releaseStage == ReleaseStage.NoInput) {
-					//if (ms.y < markersLine) {
-					if ((ms - ball.transform.position).magnitude < 2f) {
-						// Move ball left/right with touch
-						Vector3 t = ball.transform.position;
-						t.x = ms.x;
-						if (t.x < markers[0].x)
-							t.x = markers[0].x;
-						if (t.x > markers[1].x)
-							t.x = markers[1].x;
-						ball.transform.position = t;
-					} else {
-						// Begin swiping towards ball
-						releaseStage = ReleaseStage.SwipingTowardsBall;
-						swipeFrom = ms;
-					}
+					// Begin swiping towards ball
+					releaseStage = ReleaseStage.SwipingTowardsBall;
+					swipeFrom = ms;
 				} else if (releaseStage == ReleaseStage.SwipingTowardsBall) {
 					if ((ms - ball.transform.position).magnitude < 1f) {
 						// Swiped onto ball, so begin swiping away
@@ -82,26 +87,30 @@ public class GameControls : MonoBehaviour {
 				ms = Camera.main.ScreenToWorldPoint(new Vector3(m.x, m.y, -Camera.main.transform.position.z));
 
 				if (releaseStage == ReleaseStage.SwipingAwayFromBall) {
-					// Release ball
-					swipeTo = ms;
+					if ((ms - ball.transform.position).magnitude < 2f) {
+						// Release too close to the ball, so do not allow the launch
+						releaseStage = ReleaseStage.NoInput;
+					} else {
+						// Release ball
+						swipeTo = ms;
 
-					// aim towards the average of swipeFrom and swipeTo
-					Vector3 swipeMean = ((swipeFrom + swipeTo) / 2) - ball.transform.position;
+						// aim towards the average of swipeFrom and swipeTo
+						Vector3 swipeMean = ((swipeFrom + swipeTo) / 2) - ball.transform.position;
 
-					// Power of the ball is based upon the time it took the roll it
-					// A faster roller (less time) equals a faster ball (more power)
-					const float maxPower = 5f;
-					float swipePower = maxPower / ((Time.timeSinceLevelLoad - swipeTimeStart) + 0.1f);
-					Vector3 swipeVector = swipeMean.normalized * swipePower;
+						// Power of the ball is based upon the time it took the roll it
+						// A faster roller (less time) equals a faster ball (more power)
+						const float maxPower = 2.5f;
+						float swipePower = maxPower / ((Time.timeSinceLevelLoad - swipeTimeStart) + 0.1f);
+						Vector3 swipeVector = swipeMean.normalized * swipePower;
 
-					Debug.Log(swipeVector);
+						Debug.Log(swipeVector);
 
-					ball.Roll((Vector2)swipeVector);
-					//BallRoll(swipeVector);
+						ball.Roll((Vector2)swipeVector);
+						//BallRoll(swipeVector);
 
-					releaseStage = ReleaseStage.Released;
-
-				} else if (releaseStage == ReleaseStage.SwipingTowardsBall) {
+						releaseStage = ReleaseStage.Released;
+					}
+				} else if (releaseStage == ReleaseStage.SwipingTowardsBall || releaseStage == ReleaseStage.MovingBallSideways) {
 					releaseStage = ReleaseStage.NoInput;
 				}
 			}
