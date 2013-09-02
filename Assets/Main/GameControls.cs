@@ -89,7 +89,8 @@ public class GameControls : MonoBehaviour {
 
 					// Power of the ball is based upon the time it took the roll it
 					// A faster roller (less time) equals a faster ball (more power)
-					float swipePower = 10f / ((Time.timeSinceLevelLoad - swipeTimeStart) + 0.1f);
+					const float maxPower = 5f;
+					float swipePower = maxPower / ((Time.timeSinceLevelLoad - swipeTimeStart) + 0.1f);
 
 					BallRoll(swipeMean.normalized * swipePower);
 
