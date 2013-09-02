@@ -17,6 +17,8 @@ public class GameControls : MonoBehaviour {
 	Vector3 swipeFrom;
 	Vector3 swipeTo;
 
+	const float distTouchBall = 2f;
+
 	void Awake() {
 		ballPrefab = Resources.Load("Ball");
 
@@ -47,7 +49,7 @@ public class GameControls : MonoBehaviour {
 					releaseStage = ReleaseStage.NoInput;
 				}
 				if (releaseStage == ReleaseStage.NoInput) {
-					if ((ms - ball.transform.position).magnitude < 2f) {
+					if ((ms - ball.transform.position).magnitude < distTouchBall) {
 						releaseStage = ReleaseStage.MovingBallSideways;
 					}
 				}
@@ -72,7 +74,7 @@ public class GameControls : MonoBehaviour {
 					releaseStage = ReleaseStage.SwipingTowardsBall;
 					swipeFrom = ms;
 				} else if (releaseStage == ReleaseStage.SwipingTowardsBall) {
-					if ((ms - ball.transform.position).magnitude < 1f) {
+					if ((ms - ball.transform.position).magnitude < distTouchBall) {
 						// Swiped onto ball, so begin swiping away
 
 						// Power is based upon time it takes to swipe from the ball back out
@@ -87,7 +89,7 @@ public class GameControls : MonoBehaviour {
 				ms = Camera.main.ScreenToWorldPoint(new Vector3(m.x, m.y, -Camera.main.transform.position.z));
 
 				if (releaseStage == ReleaseStage.SwipingAwayFromBall) {
-					if ((ms - ball.transform.position).magnitude < 2f) {
+					if ((ms - ball.transform.position).magnitude < distTouchBall) {
 						// Release too close to the ball, so do not allow the launch
 						releaseStage = ReleaseStage.NoInput;
 					} else {
@@ -99,9 +101,15 @@ public class GameControls : MonoBehaviour {
 
 						// Power of the ball is based upon the time it took the roll it
 						// A faster roller (less time) equals a faster ball (more power)
-						const float maxPower = 2.5f;
-						float swipePower = maxPower / ((Time.timeSinceLevelLoad - swipeTimeStart) + 0.1f);
-						Vector3 swipeVector = swipeMean.normalized * swipePower;
+						//const float maxPower = 2.5f;
+						//float swipePower = maxPower / ((Time.timeSinceLevelLoad - swipeTimeStart) + 0.1f);
+						//Vector3 swipeVector = swipeMean.normalized * swipePower;
+
+						float swipeTime = Time.timeSinceLevelLoad - swipeTimeStart;
+						float swipeDist = swipeMean.magnitude;
+						float swipeSpeed = (swipeDist / swipeTime) / 4f;
+
+						Vector3 swipeVector = swipeMean.normalized * swipeSpeed;
 
 						Debug.Log(swipeVector);
 
