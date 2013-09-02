@@ -14,6 +14,7 @@ public class GameControls : MonoBehaviour {
 	Vector3 markersMid;
 	float markersLine;
 
+	float swipeTimeStart;
 	Vector3 swipeFrom;
 	Vector3 swipeTo;
 
@@ -67,6 +68,9 @@ public class GameControls : MonoBehaviour {
 				} else if (releaseStage == ReleaseStage.SwipingTowardsBall) {
 					if ((ms - ball.transform.position).magnitude < 1f) {
 						// Swiped onto ball, so begin swiping away
+
+						// Power is based upon time it takes to swipe from the ball back out
+						swipeTimeStart = Time.timeSinceLevelLoad;
 						releaseStage = ReleaseStage.SwipingAwayFromBall;
 					}
 				}
@@ -83,7 +87,11 @@ public class GameControls : MonoBehaviour {
 					// aim towards the average of swipeFrom and swipeTo
 					Vector3 swipeMean = (swipeFrom + swipeTo) / 2;
 
-					BallRoll(swipeMean);
+					// Power of the ball is based upon the time it took the roll it
+					// A faster roller (less time) equals a faster ball (more power)
+					float swipePower = 10f / ((Time.timeSinceLevelLoad - swipeTimeStart) + 0.1f);
+
+					BallRoll(swipeMean.normalized * swipePower);
 
 					releaseStage = ReleaseStage.Released;
 
