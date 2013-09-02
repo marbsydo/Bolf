@@ -51,7 +51,8 @@ public class GameControls : MonoBehaviour {
 				ms = Camera.main.ScreenToWorldPoint(new Vector3(m.x, m.y, -Camera.main.transform.position.z));
 
 				if (releaseStage == ReleaseStage.NoInput) {
-					if (ms.y < markersLine) {
+					//if (ms.y < markersLine) {
+					if ((ms - ball.transform.position).magnitude < 2f) {
 						// Move ball left/right with touch
 						Vector3 t = ball.transform.position;
 						t.x = ms.x;
@@ -85,14 +86,18 @@ public class GameControls : MonoBehaviour {
 					swipeTo = ms;
 
 					// aim towards the average of swipeFrom and swipeTo
-					Vector3 swipeMean = (swipeFrom + swipeTo) / 2;
+					Vector3 swipeMean = ((swipeFrom + swipeTo) / 2) - ball.transform.position;
 
 					// Power of the ball is based upon the time it took the roll it
 					// A faster roller (less time) equals a faster ball (more power)
 					const float maxPower = 5f;
 					float swipePower = maxPower / ((Time.timeSinceLevelLoad - swipeTimeStart) + 0.1f);
+					Vector3 swipeVector = swipeMean.normalized * swipePower;
 
-					BallRoll(swipeMean.normalized * swipePower);
+					Debug.Log(swipeVector);
+
+					ball.Roll((Vector2)swipeVector);
+					//BallRoll(swipeVector);
 
 					releaseStage = ReleaseStage.Released;
 
@@ -147,7 +152,9 @@ public class GameControls : MonoBehaviour {
 		}
 	}
 */
+/*
 	void BallRoll(Vector3 pos) {
 		ball.Roll((Vector2)pos - (Vector2)ball.transform.position);
 	}
+*/
 }
