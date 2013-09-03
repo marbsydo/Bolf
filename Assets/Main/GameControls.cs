@@ -74,14 +74,14 @@ public class GameControls : MonoBehaviour {
 					releaseStage = ReleaseStage.SwipingTowardsBall;
 					swipeFrom = ms;
 				} else if (releaseStage == ReleaseStage.SwipingTowardsBall) {
-					if (ms.y < ball.transform.position.y + 1f) {
+					if (ms.y < ball.transform.position.y + 0.5f) {
 
 						// Power is based upon time it takes to swipe from the ball back out
 						
 						releaseStage = ReleaseStage.WaitingToSwipeAway;
 					}
 				} else if (releaseStage == ReleaseStage.WaitingToSwipeAway) {
-					if (ms.y > ball.transform.position.y + 2f) {
+					if (ms.y > ball.transform.position.y + 1f) {
 						swipeTimeStart = Time.timeSinceLevelLoad;
 						releaseStage = ReleaseStage.SwipingAwayFromBall;
 					}
@@ -138,7 +138,7 @@ public class GameControls : MonoBehaviour {
 
 	void CreateBall(Vector3 p) {
 		if (ballStage == BallStage.DoesNotExist) {
-			ball = (Instantiate(ballPrefab, p, Quaternion.identity) as GameObject).AddComponent<Ball>();
+			ball = (Instantiate(ballPrefab, p, Quaternion.identity) as GameObject).GetComponent<Ball>();
 			ballStage = BallStage.AwaitingRelease;
 		} else {
 			Debug.LogError("Tried to create a new ball when one already exists");

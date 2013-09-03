@@ -19,6 +19,6 @@ public class MainController : MonoBehaviour {
 			}
 		}
 
-		floorObj.transform.position = new Vector3(-7f, -12f, 0.5f);
+		floorObj.transform.position = new Vector3(-7f, -12f, 1f);
 	}
 }
