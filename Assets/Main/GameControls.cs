@@ -112,7 +112,7 @@ public class GameControls : MonoBehaviour {
 
 						float swipeTime = Time.timeSinceLevelLoad - swipeTimeStart;
 						float swipeDist = swipeMean.magnitude;
-						float swipeSpeed = (swipeDist / swipeTime) / 25f;
+						float swipeSpeed = (swipeDist / swipeTime) / 15f;
 
 						Vector3 swipeVector = swipeMean.normalized * swipeSpeed;
 
