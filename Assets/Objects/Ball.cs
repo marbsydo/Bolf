@@ -15,10 +15,7 @@ public class Ball : MonoBehaviour {
 	}
 
 	public void Update() {
-		//holes.transform.Rotate((new Vector3(rigidbody.velocity.y, -rigidbody.velocity.x, 0f)).normalized * (rigidbody.velocity.magnitude / 30));
-		Vector3 a = (new Vector3(rigidbody.velocity.y, -rigidbody.velocity.x, 0f)).normalized;
-		float b = (rigidbody.velocity.magnitude / 30);
-		holes.transform.Rotate(a * b);
+		holes.transform.Rotate(((new Vector3(rigidbody.velocity.y, 0f, -rigidbody.velocity.x)).normalized) * (rigidbody.velocity.magnitude * 50f * Time.deltaTime));
 	}
 
 	public void Roll(Vector2 v) {
