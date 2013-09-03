@@ -10,7 +10,7 @@ public class Hole : MonoBehaviour {
 			Vector3 diff = collider.transform.position - transform.position;
 			Vector3 forceVector;
 			if (diff.magnitude > 0.3f && diff.magnitude < 0.7f) {
-				forceVector = diff.normalized * -0.1f * 1/Mathf.Max(diff.magnitude, 1);
+				forceVector = diff.normalized * -0.1f * 1/Mathf.Max(diff.magnitude, 1) * (Time.deltaTime * 40);
 				collider.rigidbody.AddForce(forceVector, ForceMode.VelocityChange);
 			}
 			if (diff.magnitude < 0.5f) {

@@ -41,7 +41,7 @@ public class Ball : MonoBehaviour {
 			rigidbody.drag = 5f;
 			Vector3 diff = transform.position - (targetHole.transform.position + new Vector3(0, -0.2f, 0));
 			if (diff.magnitude > 0.05f)
-				rigidbody.AddForce(diff.normalized * -0.1f * 1/Mathf.Max(diff.magnitude, 1f), ForceMode.VelocityChange);
+				rigidbody.AddForce(diff.normalized * -0.1f * 1/Mathf.Max(diff.magnitude, 1f) * (Time.deltaTime * 40), ForceMode.VelocityChange);
 		}
 	}
 
