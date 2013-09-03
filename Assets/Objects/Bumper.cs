@@ -10,7 +10,7 @@ public class Bumper : MonoBehaviour {
 			Expand();
 
 			// Apply a force to the ball
-			Vector3 forceVector = (collision.transform.position - transform.position).normalized * 5f;
+			Vector3 forceVector = (collision.transform.position - transform.position).normalized * 3f;
 			collision.rigidbody.AddForce(forceVector, ForceMode.VelocityChange);
 		}
 	}

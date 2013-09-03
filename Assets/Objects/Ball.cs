@@ -21,7 +21,7 @@ public class Ball : MonoBehaviour {
 	public void Update() {
 		holes.transform.Rotate(((new Vector3(rigidbody.velocity.y, 0f, -rigidbody.velocity.x)).normalized) * (rigidbody.velocity.magnitude * 50f * Time.deltaTime));
 
-		Debug.Log(rigidbody.velocity.magnitude);
+		//Debug.Log(rigidbody.velocity.magnitude);
 
 		float v = rigidbody.velocity.magnitude;
 		if (v > velocityThreshold3) {
