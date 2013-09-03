@@ -139,6 +139,7 @@ public class GameControls : MonoBehaviour {
 	void CreateBall(Vector3 p) {
 		if (ballStage == BallStage.DoesNotExist) {
 			ball = (Instantiate(ballPrefab, p, Quaternion.identity) as GameObject).GetComponent<Ball>();
+			ball.name = "Ball";
 			ballStage = BallStage.AwaitingRelease;
 		} else {
 			Debug.LogError("Tried to create a new ball when one already exists");
