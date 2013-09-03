@@ -7,6 +7,6 @@ public class MainCamera : MonoBehaviour {
 
 	void Update() {
 		camera.orthographicSize = (desiredRoomWidth / 2) / Screen.width * Screen.height;
-		Debug.Log(Time.deltaTime + " " + 1/Time.deltaTime + " " + (Time.deltaTime * 1/Time.deltaTime));
+		//Debug.Log(Time.deltaTime + " " + 1/Time.deltaTime + " " + (Time.deltaTime * 1/Time.deltaTime));
 	}
 }
