@@ -116,8 +116,6 @@ public class GameControls : MonoBehaviour {
 
 						Vector3 swipeVector = swipeMean.normalized * swipeSpeed;
 
-						Debug.Log(swipeVector);
-
 						ball.Roll((Vector2)swipeVector);
 						//BallRoll(swipeVector);
 
