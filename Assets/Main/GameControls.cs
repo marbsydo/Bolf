@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 enum BallStage {DoesNotExist, AwaitingRelease, InMotion};
-enum ReleaseStage {NoInput, MovingBallSideways, SwipingTowardsBall, SwipingAwayFromBall, Released}
+enum ReleaseStage {NoInput, MovingBallSideways, SwipingTowardsBall, WaitingToSwipeAway, SwipingAwayFromBall, Released}
 
 public class GameControls : MonoBehaviour {
 	Object ballPrefab;
@@ -74,10 +74,14 @@ public class GameControls : MonoBehaviour {
 					releaseStage = ReleaseStage.SwipingTowardsBall;
 					swipeFrom = ms;
 				} else if (releaseStage == ReleaseStage.SwipingTowardsBall) {
-					if ((ms - ball.transform.position).magnitude < distTouchBall) {
-						// Swiped onto ball, so begin swiping away
+					if (ms.y < ball.transform.position.y + 1f) {
 
 						// Power is based upon time it takes to swipe from the ball back out
+						
+						releaseStage = ReleaseStage.WaitingToSwipeAway;
+					}
+				} else if (releaseStage == ReleaseStage.WaitingToSwipeAway) {
+					if (ms.y > ball.transform.position.y + 2f) {
 						swipeTimeStart = Time.timeSinceLevelLoad;
 						releaseStage = ReleaseStage.SwipingAwayFromBall;
 					}
@@ -97,7 +101,8 @@ public class GameControls : MonoBehaviour {
 						swipeTo = ms;
 
 						// aim towards the average of swipeFrom and swipeTo
-						Vector3 swipeMean = ((swipeFrom + swipeTo) / 2) - ball.transform.position;
+						//TODO: Make less accurate if swipeFrom and swipeTo vary a lot
+						Vector3 swipeMean = swipeTo - ball.transform.position;//((swipeFrom + swipeTo) / 2) - ball.transform.position;
 
 						// Power of the ball is based upon the time it took the roll it
 						// A faster roller (less time) equals a faster ball (more power)
@@ -107,7 +112,7 @@ public class GameControls : MonoBehaviour {
 
 						float swipeTime = Time.timeSinceLevelLoad - swipeTimeStart;
 						float swipeDist = swipeMean.magnitude;
-						float swipeSpeed = (swipeDist / swipeTime) / 4f;
+						float swipeSpeed = (swipeDist / swipeTime) / 25f;
 
 						Vector3 swipeVector = swipeMean.normalized * swipeSpeed;
 
@@ -118,7 +123,7 @@ public class GameControls : MonoBehaviour {
 
 						releaseStage = ReleaseStage.Released;
 					}
-				} else if (releaseStage == ReleaseStage.SwipingTowardsBall || releaseStage == ReleaseStage.MovingBallSideways) {
+				} else if (releaseStage == ReleaseStage.SwipingTowardsBall || releaseStage == ReleaseStage.MovingBallSideways || releaseStage == ReleaseStage.WaitingToSwipeAway) {
 					releaseStage = ReleaseStage.NoInput;
 				}
 			}
