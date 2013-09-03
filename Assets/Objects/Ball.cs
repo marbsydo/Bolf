@@ -5,9 +5,9 @@ public class Ball : MonoBehaviour {
 
 	GameObject holes;
 
-	float velocityThreshold1 = 15f;
-	float velocityThreshold2 = 20f;
-	float velocityThreshold3 = 25f;
+	float velocityThreshold1 = 5f;
+	float velocityThreshold2 = 7.5f;
+	float velocityThreshold3 = 10f;
 
 	public void Awake() {
 		Transform[] children = gameObject.GetComponentsInChildren<Transform>();
@@ -27,11 +27,11 @@ public class Ball : MonoBehaviour {
 		if (v > velocityThreshold3) {
 			rigidbody.drag = 2f;
 		} else if (v > velocityThreshold2) {
-			rigidbody.drag = 0.5f;
+			rigidbody.drag = 0.2f;
 		} else if (v > velocityThreshold1) {
-			rigidbody.drag = 0.05f;
+			rigidbody.drag = 0.1f;
 		} else {
-			rigidbody.drag = 0f;
+			rigidbody.drag = 0.05f;
 		}
 	}
 
