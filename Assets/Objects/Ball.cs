@@ -38,10 +38,20 @@ public class Ball : MonoBehaviour {
 
 		if (targetHole != null) {
 			// Apply high drag and pull the ball into the hole
+			
+			// Work out the vector between us (the ball) and the bottom of the hole (which is slightly lower than the center to give a 3D effect)
+			Vector3 diff = transform.position - (targetHole.transform.position + new Vector3(0, -0.25f, 0));
+
+			// Make the ball shrink slightly as it goes in the hole
+			transform.localScale = Vector3.Slerp(transform.localScale, Vector3.one * 0.9f, Time.deltaTime * 2f);
+
+			// Apply a high amount of drag to make the ball come to a reset when it reaches the middle
 			rigidbody.drag = 5f;
-			Vector3 diff = transform.position - (targetHole.transform.position + new Vector3(0, -0.2f, 0));
-			if (diff.magnitude > 0.05f)
-				rigidbody.AddForce(diff.normalized * -0.1f * 1/Mathf.Max(diff.magnitude, 1f) * (Time.deltaTime * 40), ForceMode.VelocityChange);
+
+			if (diff.magnitude > 0.05f) {
+				// Pull ball into hole until it comes to rest
+				rigidbody.AddForce(diff.normalized * -0.6f * 1/Mathf.Max(diff.magnitude, 1f) * (Time.deltaTime * 40), ForceMode.VelocityChange);
+			}
 		}
 	}
 
