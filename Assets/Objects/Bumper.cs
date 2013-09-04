@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Bumper : MonoBehaviour {
 	void OnCollisionEnter(Collision collision) {
-		if (collision.collider.CompareTag("Ball")) {
+		if (collision.collider.CompareTag("Ball") || collision.collider.CompareTag("Skittle")) {
 			// The ball hit us
 
 			// Do the bumper animation
