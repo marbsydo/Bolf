@@ -12,7 +12,7 @@ public class MainController : MonoBehaviour {
 
 		int tilesX = 8;
 		int tilesY = 16;
-		float lineY = 3.5f;
+		float lineY = 4f;
 
 		for (int j = 0; j < tilesY; j++) {
 			for (int i = 0; i < tilesX; i++) {

@@ -2,7 +2,8 @@ using UnityEngine;
 using System.Collections;
 
 enum BallStage {DoesNotExist, AwaitingRelease, InMotion};
-enum ReleaseStage {NoInput, MovingBallSideways, SwipingTowardsBall, WaitingToSwipeAway, SwipingAwayFromBall, Released}
+//enum ReleaseStage {NoInput, MovingBallSideways, SwipingTowardsBall, WaitingToSwipeAway, SwipingAwayFromBall, Released}
+enum ReleaseStage {NoInput, Swiping, Released};
 
 public class GameControls : MonoBehaviour {
 	Object ballPrefab;
@@ -12,12 +13,20 @@ public class GameControls : MonoBehaviour {
 
 	Vector3[] markers;
 	Vector3 markersMid;
+	float markersLine;
+
+	Vector3 ballPositionAtFirstTouch;
 
 	float swipeTimeStart;
 	Vector3 swipeFrom;
 	Vector3 swipeTo;
 
 	const float distTouchBall = 2f;
+
+	// Constants used to modify the ball's pre-roll appearance
+	const float distBallCanBeHeldBack = 1.5f;
+	const float ballScalingModifier = 0.5f; // This is how much bigger the ball gets e.g. 1.5 = 150%
+	const float ballSinModifier = 2f;
 
 	void Awake() {
 		ballPrefab = Resources.Load("Ball");
@@ -27,7 +36,7 @@ public class GameControls : MonoBehaviour {
 		markers[0] = GameObject.Find("BallMarkerLeft").transform.position;
 		markers[1] = GameObject.Find("BallMarkerRight").transform.position;
 		markersMid = markers[0] + (markers[1] - markers[0]) / 2;
-		//markersLine = markersMid.y + 1.5f;
+		markersLine = markersMid.y + 1.62f;
 	}
 
 	void Start() {
@@ -37,6 +46,65 @@ public class GameControls : MonoBehaviour {
 	void Update() {
 		if (ballStage == BallStage.AwaitingRelease) {
 
+			// Player touches beneath the line, then moves their finger
+			// If the touch goes horizontal, move the ball to where the finger is
+			// If the touch goes upwards, return the ball to the position it was first at when touched, and fire upon release
+
+			Vector3 mPos, mPosWorld; // mPos = mouse coords in screen space; mPosWorld = mouse coords in world space
+
+			mPos = Input.mousePosition;
+			mPosWorld = Camera.main.ScreenToWorldPoint(new Vector3(mPos.x, mPos.y, -Camera.main.transform.position.z));
+
+			if (Input.GetMouseButtonDown(0)) {
+				releaseStage = ReleaseStage.Swiping;
+			}
+
+			if (releaseStage == ReleaseStage.Swiping) {
+				if (Input.GetMouseButton(0)) {
+
+					// Make a target variable for the ball's position
+					Vector3 ballTargetPos = ball.transform.position;
+
+					// Set the target X position, clamped between two points
+					ballTargetPos.x = mPosWorld.x;
+					ballTargetPos.x = Mathf.Max(markers[0].x + 0.3f, ballTargetPos.x);
+					ballTargetPos.x = Mathf.Min(markers[1].x - 0.3f, ballTargetPos.x);
+
+					// Set the target Y position
+					float offsetY = Mathf.Max(0f, markersLine - mPosWorld.y);
+					offsetY = Mathf.Sin(Mathf.Min(offsetY / ballSinModifier, Mathf.PI/2f)) * distBallCanBeHeldBack; // Use Min to limit below 2pi to avoid looping back upon itself
+					////offsetY = Mathf.Min(offsetY, distBallCanBeHeldBack); // Same as above line, but linear instead of circular movement. Circular looks better.
+					ballTargetPos.y = markersLine - offsetY;
+					
+					// Lerp the target position each axis individually so that lerping can be performed at different timescales
+					Vector3 ballTargetPosLerped;
+					ballTargetPosLerped.z = ballTargetPos.z; // Move instantly, because Z is always locked
+					float yModifier = 5f;//40f;
+					float xModifier = 8f;
+					//if (ballTargetPos.y > ball.transform.position.y) {yModifier = 5f;}
+					ballTargetPosLerped.y = Mathf.Lerp(ball.transform.position.y, ballTargetPos.y, Time.deltaTime * yModifier); // Move in y quite fast
+					ballTargetPosLerped.x = Mathf.Lerp(ball.transform.position.x, ballTargetPos.x, Time.deltaTime * xModifier); // Move in x quite slow
+
+					// Finally move the ball to its new target position, after lerping
+					ball.transform.position = ballTargetPosLerped;
+
+					// Also update the ball's scale using Sin again to give the appearance of height
+					ball.SetScale(CalculateBallScale());//Vector3.one * (1 + Mathf.Sin(Mathf.Max(0f, markersLine - ball.transform.position.y) / ballSinModifier) * ballScalingModifier);
+				} else {
+					releaseStage = ReleaseStage.NoInput;
+				}
+			}
+
+			if (releaseStage == ReleaseStage.NoInput) {
+				Vector3 t = ball.transform.position;
+				t.y = Mathf.Lerp(t.y, markersLine, Time.deltaTime * 5f);
+				ball.transform.position = t;
+
+				ball.SetScale(CalculateBallScale());//Vector3.one * (1 + Mathf.Sin(Mathf.Max(0f, markersLine - ball.transform.position.y) / ballSinModifier) * ballScalingModifier);
+			}
+
+
+			/*
 			Vector3 m, ms;
 
 			if (Input.GetMouseButtonDown(0)) {
@@ -125,7 +193,12 @@ public class GameControls : MonoBehaviour {
 					releaseStage = ReleaseStage.NoInput;
 				}
 			}
+		*/
 		}
+	}
+
+	Vector3 CalculateBallScale() {
+		return Vector3.one * (1 + Mathf.Sin(Mathf.Max(0f, markersLine - ball.transform.position.y) / ballSinModifier) * ballScalingModifier);
 	}
 
 	void ResetBall() {

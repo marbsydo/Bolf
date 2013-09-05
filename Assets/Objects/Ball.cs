@@ -62,4 +62,8 @@ public class Ball : MonoBehaviour {
 	public void GoInHole(Hole hole) {
 		targetHole = hole;
 	}
+
+	public void SetScale(Vector3 s) {
+		transform.localScale = s;
+	}
 }
