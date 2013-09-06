@@ -16,6 +16,10 @@ public class GameControls : MonoBehaviour {
 	float markersLine;
 
 	Vector3 ballPositionAtFirstTouch;
+	Vector3[] mPosWorldPrev = new Vector3[2];
+	public bool swipingUpwards = false;
+	public bool swipingUpwardsFast = false;
+	const float swipingSpeedThreshold = 0.5f;
 
 	float swipeTimeStart;
 	Vector3 swipeFrom;
@@ -46,6 +50,20 @@ public class GameControls : MonoBehaviour {
 	void Update() {
 		if (ballStage == BallStage.AwaitingRelease) {
 
+			/*
+			TODO: Rip out everything except the section in Input.GetMouseButton(0) which does the 3D stuff
+			Instead, make it so that the ball it just below the line at the start.
+			The user can then slide the ball left and right.
+			When their X position is chosen, they swipe straight down and the ball locks into its X position while moving in the Y.
+			The user can then swipe forward (or diagonally forward).
+
+			//EDIT: Script the above. Do the following:
+			1) Write a generic script to detect the speed and direction of mouse/touch input over the last X seconds
+			1b) Make the script able to tell for how many X seconds the mouse/touch input has not changed direction by more than e.g. 90 degrees
+			2) Make the ball following the mouse/touch like normal in the Input.GetMouseButton(0) code below
+			3) If the finger crosses the line, take the speed and direction from the last "straight line" as decided in 1b) and fire the ball accordingly
+			*/
+
 			// Player touches beneath the line, then moves their finger
 			// If the touch goes horizontal, move the ball to where the finger is
 			// If the touch goes upwards, return the ball to the position it was first at when touched, and fire upon release
@@ -57,6 +75,9 @@ public class GameControls : MonoBehaviour {
 
 			if (Input.GetMouseButtonDown(0)) {
 				releaseStage = ReleaseStage.Swiping;
+
+				// Set our history of the last two touches to mPosWorld
+				mPosWorldPrev[0] = mPosWorldPrev[1] = mPosWorld;
 			}
 
 			if (releaseStage == ReleaseStage.Swiping) {
@@ -88,10 +109,59 @@ public class GameControls : MonoBehaviour {
 					// Finally move the ball to its new target position, after lerping
 					ball.transform.position = ballTargetPosLerped;
 
+					// If the user is wiping upwards, actually just leave the ball where it was when the swipe began
+					if (swipingUpwardsFast) {
+						ball.transform.position = swipeFrom;
+					}
+
 					// Also update the ball's scale using Sin again to give the appearance of height
 					ball.SetScale(CalculateBallScale());//Vector3.one * (1 + Mathf.Sin(Mathf.Max(0f, markersLine - ball.transform.position.y) / ballSinModifier) * ballScalingModifier);
+
+					// If the mouse is moving up, when previously it was moving down, record this as the start of the swipe
+					if (swipingUpwards == false && mPosWorld.y > mPosWorldPrev[0].y && mPosWorldPrev[0].y <= mPosWorldPrev[1].y && mPosWorld.y < markersLine - 1f) {
+						Debug.Log("STARTED MOVING" + Random.value);
+						swipingUpwards = true;
+						swipeFrom = ball.transform.position;
+					}
+
+					// If swiping upwards, measure how fast the swipe is. If it is fast, enabled swipingUpwardsFast. This locks us into the swipe procedure.
+					if (swipingUpwards) {
+						if ((mPosWorld - mPosWorldPrev[1]).magnitude > swipingSpeedThreshold && (Mathf.Abs(mPosWorld.x - mPosWorldPrev[1].x) < 0.6f)) {
+							swipingUpwardsFast = true;
+						}
+					}
+
+					// If the mouse is moving down, when previously it was ALSO moving down, record this as resetting the swipe
+					if (swipingUpwards == true && mPosWorld.y < mPosWorldPrev[0].y && mPosWorldPrev[0].y < mPosWorldPrev[1].y) {
+						Debug.Log("RESETTING" + Random.value);
+						swipingUpwards = false;
+						swipingUpwardsFast = false;
+					}
+
+					// If the mouse has been in the same place for a while, record this as resetting the swipe
+
+					if (mPosWorldPrev[0] != mPosWorldPrev[1])
+						mPosWorldPrev[1] = mPosWorldPrev[0];
+					if (mPosWorld != mPosWorldPrev[0])
+						mPosWorldPrev[0] = mPosWorld;
+
+
 				} else {
 					releaseStage = ReleaseStage.NoInput;
+				}
+			}
+
+			if (Input.GetMouseButtonUp(0)) {
+				if (swipingUpwardsFast) {
+					swipingUpwards = false;
+					swipingUpwardsFast = false;
+					// If released while moving fast, fire the ball!
+					//if (mPosWorld.y > mPosWorldPrev[0].y && mPosWorldPrev[0].y > mPosWorldPrev[1].y) {
+					if ((mPosWorld - mPosWorldPrev[1]).magnitude > swipingSpeedThreshold) {
+						Debug.LogWarning("FIRING BALL!" + Random.value);
+					} else { // Else if release while not moving, reset the ball
+						Debug.Log("RESETTING_F" + Random.value);
+					}
 				}
 			}
 
