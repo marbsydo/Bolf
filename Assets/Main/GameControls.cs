@@ -43,11 +43,15 @@ public class GameControls : MonoBehaviour {
 			mPos = Input.mousePosition;
 			mPosWorld = Camera.main.ScreenToWorldPoint(new Vector3(mPos.x, mPos.y, -Camera.main.transform.position.z));
 
-			swipeSensor.AddPoint((Vector2) mPosWorld);
+			if (Input.GetMouseButton(0)) {
+				swipeSensor.AddPoint((Vector2) mPosWorld);
+			}
+
+			if (Input.GetMouseButtonUp(0)) {
+				swipeSensor.ResetPoints();
+			}
 
 			Vector2[] swipe = swipeSensor.GetLongestStraightishSwipe();
-			//Debug.Log(swipe.Length + " " + Random.value);
-			//Vector2[] swipe = swipeSensor.GetSwipeHistory(1f);
 			if (swipe.Length >= 2) {
 				for (int i = 0; i < swipe.Length - 2; i++) {
 					Debug.DrawLine((Vector3) swipe[i], (Vector3) swipe[i + 1]);
@@ -95,7 +99,7 @@ public class SwipeSensor {
 	// swipeHistoryLengthMax * swipeHistoryTimeInterval = how many seconds of history are recorded
 	private const int swipeHistoryLengthMax = 40;
 	private int swipeHistoryLength;
-	private const int shortestAllowedSwipe = 5;
+	private const int shortestAllowedSwipe = 4;
 	private Vector2[] swipeHistory = new Vector2[swipeHistoryLengthMax];
 	private float swipeHistoryTimeInterval = 0.05f;
 	private float swipeHistoryTimeLast;
@@ -151,8 +155,17 @@ public class SwipeSensor {
 		return xPoints;
 	}
 
+	// This function checks whether a given series of Vector2 points resemble a straight line
+	// First, the function ConvertPointsToNormals converts the series of points to where is
+	// referred to as normals. Essentially, this is the normalized difference between adjacent
+	// vector. As a result, all values will have a magnitude of 1 (with the exception of vectors
+	// that were equal to Vector2.zero will have a magnitude of 0). Secondly, the function
+	// AreNormalsSimilar will check whether all these normals are similar, i.e. the mean is taken,
+	// and true is returned if all normals are within the given threshold of the mean. Logically
+	// this means that all the vectors are pointing in the same direction, so the original line
+	// must have been straight-ish!
 	public bool ArePointsStraightish(Vector2[] ps, float threshold) {
-		return AreNormalsSimilar(ConvertPointsToNormals(ps), threshold);
+		return AreNormalsSimilar(ConvertPointsToNormals(ps), threshold, true);
 	}
 
 	public Vector2[] ConvertPointsToNormals(Vector2[] ps) {
@@ -167,7 +180,11 @@ public class SwipeSensor {
 		return ns;
 	}
 
-	public bool AreNormalsSimilar(Vector2[] ns, float threshold) {
+	public bool AreNormalsSimilar(Vector2[] ns, float threshold, bool ignoreZeroMagnitudes) {
+
+		// ns = Array of Vector2 normals to be compared
+		// threshold = If any value in ns deviates from the mean by amount `threshold` or more, false is returned
+		// ignoreZeroMagnitudes = If true, any value in ns equal to Vector2.zero will not cause false to be returned
 
 		// Calculate mean
 		Vector2 nsMean = Vector2.zero;
@@ -180,7 +197,7 @@ public class SwipeSensor {
 		// Compare all points to the mean
 		bool similar = true;
 		for (int i = 1; i < ns.Length; i++) {
-			if ((ns[i] - nsMean).magnitude > threshold) {
+			if ((ns[i] - nsMean).magnitude > threshold && (ns[i] != Vector2.zero ^ !ignoreZeroMagnitudes)) {
 				similar = false;
 				break;
 			}
