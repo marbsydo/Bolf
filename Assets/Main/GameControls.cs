@@ -158,10 +158,10 @@ public class SwipeSensor {
 	public Vector2[] ConvertPointsToNormals(Vector2[] ps) {
 
 		// Subtracts the first element from all other elements in the array, then normalizses the result
-		// The returned array is 1 item shorter than the inputted array because the first element is dropped
+		// The returned array is 1 element shorter than the inputted array
 		Vector2[] ns = new Vector2[Mathf.Max(0, ps.Length - 1)];
 		for (int i = 1; i < ns.Length; i++) {
-			ns[i] = (ps[i] - ps[0]).normalized;
+			ns[i] = (ps[i] - ps[i - 1]).normalized;
 		}
 
 		return ns;
