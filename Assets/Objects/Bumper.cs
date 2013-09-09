@@ -21,5 +21,9 @@ public class Bumper : MonoBehaviour {
 
 	void Update() {
 		transform.localScale = Vector3.Slerp(transform.localScale, Vector3.one, Time.deltaTime * 8);
+
+		Vector3 temp = transform.eulerAngles;
+		temp.z = Mathf.Sin(Time.timeSinceLevelLoad * 2f) * 10f;
+		transform.eulerAngles = temp;
 	}
 }
