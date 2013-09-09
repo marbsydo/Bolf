@@ -7,6 +7,7 @@ public class Ball : MonoBehaviour {
 
 	Hole targetHole;
 	bool isInHole = false;
+	public bool inSlowArea = false;
 
 	float velocityThreshold1 = 5f;
 	float velocityThreshold2 = 7.5f;
@@ -37,6 +38,11 @@ public class Ball : MonoBehaviour {
 			rigidbody.drag = 0.05f;
 		}
 
+		if (inSlowArea) {
+			rigidbody.drag = 4f;//rigidbody.drag * 20f;
+			inSlowArea = false;
+		}
+
 		if (targetHole != null) {
 			// Apply high drag and pull the ball into the hole
 			
@@ -53,6 +59,12 @@ public class Ball : MonoBehaviour {
 				// Pull ball into hole until it comes to rest
 				rigidbody.AddForce(diff.normalized * -0.6f * 1/Mathf.Max(diff.magnitude, 1f) * (Time.deltaTime * 40), ForceMode.VelocityChange);
 			}
+		}
+	}
+
+	public void OnTriggerStay(Collider collider) {
+		if (collider.gameObject.CompareTag("SlowArea")) {
+			inSlowArea = true;
 		}
 	}
 

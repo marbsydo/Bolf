@@ -14,6 +14,7 @@ public class MainController : MonoBehaviour {
 		int tilesY = 16;
 		float lineY = 4f;
 
+		/*
 		for (int j = 0; j < tilesY; j++) {
 			for (int i = 0; i < tilesX; i++) {
 				GameObject floorSpriteObj = GameObject.Instantiate(floorSprite, new Vector3(i * 2, j * 2, 0), Quaternion.identity) as GameObject;
@@ -21,7 +22,8 @@ public class MainController : MonoBehaviour {
 				floorSpriteObj.transform.parent = floorObj.transform;
 			}
 		}
-
+		*/
+		/*
 		for (int i = 0; i < tilesX; i++) {
 			GameObject floorLineSpriteObj = GameObject.Instantiate(floorLineSprite, new Vector3(i * 2, lineY, -0.1f), Quaternion.identity) as GameObject;
 			floorLineSpriteObj.name = "FloorLine";
@@ -29,5 +31,6 @@ public class MainController : MonoBehaviour {
 		}
 
 		floorObj.transform.position = new Vector3(-7f, -12f, 1f);
+		*/
 	}
 }
