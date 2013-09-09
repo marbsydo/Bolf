@@ -38,24 +38,48 @@ public class GameControls : MonoBehaviour {
 	void Update() {
 		if (ballStage == BallStage.AwaitingRelease) {
 
+			// Get the current swipe
+			Vector2[] swipe = swipeSensor.GetLongestStraightishSwipe();
+			bool lineExists = (swipe.Length >= 2); // Must be at least 2 points for a line to exist in the swipe
+			Vector2 lineStart = Vector2.zero;
+			Vector2 lineVector = Vector2.zero;
+			float lineTime = 1f; //TODO: Calculate time it took to draw the line
+			if (lineExists) {
+				lineStart = swipe[swipe.Length - 1];
+				lineVector = swipe[0] - lineStart;
+			}
+
+			// Draw debug swipe (black = raw; white = inferred line)
+			if (Debug.isDebugBuild) {
+				if (lineExists) {
+					for (int i = 0; i < swipe.Length - 1; i++) {
+						Debug.DrawLine((Vector3) swipe[i], (Vector3) swipe[i + 1], Color.black);
+					}
+					Debug.DrawLine((Vector3) lineStart, (Vector3) (lineStart + lineVector), Color.white);
+				}
+			}
+
 			Vector3 mPos, mPosWorld; // mPos = mouse coords in screen space; mPosWorld = mouse coords in world space
 
 			mPos = Input.mousePosition;
 			mPosWorld = Camera.main.ScreenToWorldPoint(new Vector3(mPos.x, mPos.y, -Camera.main.transform.position.z));
+
+			if (Input.GetMouseButtonDown(0)) {
+				ResetBall();
+			}
 
 			if (Input.GetMouseButton(0)) {
 				swipeSensor.AddPoint((Vector2) mPosWorld);
 			}
 
 			if (Input.GetMouseButtonUp(0)) {
-				swipeSensor.ResetPoints();
-			}
-
-			Vector2[] swipe = swipeSensor.GetLongestStraightishSwipe();
-			if (swipe.Length >= 2) {
-				for (int i = 0; i < swipe.Length - 2; i++) {
-					Debug.DrawLine((Vector3) swipe[i], (Vector3) swipe[i + 1]);
+				if (lineExists) {
+					if (((Vector2) ball.transform.position - lineStart).magnitude < 2f) {
+						Vector3 forceVector = ((Vector3) lineVector.normalized) * (lineVector.magnitude / lineTime);
+						ball.rigidbody.AddForce(forceVector, ForceMode.Impulse);
+					}
 				}
+				swipeSensor.ResetPoints();
 			}
 		}
 	}
@@ -96,19 +120,27 @@ public class GameControls : MonoBehaviour {
 
 public class SwipeSensor {
 
-	// swipeHistoryLengthMax * swipeHistoryTimeInterval = how many seconds of history are recorded
+	// if timeLimited is true, then
+	//   swipeHistoryLengthMax * swipeHistoryTimeInterval = how many seconds of history are recorded
+
+	private bool timeLimited = false;
 	private const int swipeHistoryLengthMax = 40;
 	private int swipeHistoryLength;
-	private const int shortestAllowedSwipe = 4;
+	private const int minAllowedPoints = 4;
 	private Vector2[] swipeHistory = new Vector2[swipeHistoryLengthMax];
 	private float swipeHistoryTimeInterval = 0.05f;
-	private float swipeHistoryTimeLast;
+	private float swipeHistoryTimeLast = -999;
+	private float swipeHistoryPosInterval = 0.5f;
+	private Vector2 swipeHistoryPosLast = Vector2.one * -999;
 
 	// This function should be called constantly to inform SwipeSensor of the current swipe position
 	public void AddPoint(Vector2 point) {
-		// Only add another point if there has been a sufficient time interval
-		if (swipeHistoryTimeLast == null || Time.timeSinceLevelLoad > swipeHistoryTimeLast + swipeHistoryTimeInterval) {
+		bool sufficientTimeInterval = Time.timeSinceLevelLoad > swipeHistoryTimeLast + swipeHistoryTimeInterval;
+		bool sufficientPosInterval = (swipeHistoryPosLast - point).magnitude > swipeHistoryPosInterval;
+
+		if ((timeLimited && sufficientTimeInterval) || (!timeLimited && sufficientPosInterval)) {
 			swipeHistoryTimeLast = Time.timeSinceLevelLoad;
+			swipeHistoryPosLast = point;
 
 			for (int i = swipeHistoryLengthMax - 2; i >= 0; i--) {
 				swipeHistory[i + 1] = swipeHistory[i];
@@ -132,9 +164,9 @@ public class SwipeSensor {
 	public Vector2[] GetLongestStraightishSwipe() {
 		Vector2[] ps = new Vector2[0];
 		bool found = false;
-		for (int i = swipeHistoryLength; i >= shortestAllowedSwipe; i--) {
+		for (int i = swipeHistoryLength; i >= minAllowedPoints; i--) {
 			ps = FirstXPoints(i);
-			if (ArePointsStraightish(ps, 0.2f)) {
+			if (ArePointsStraightish(ps, 0.4f)) {
 				found = true;
 				break;
 			}
@@ -196,7 +228,7 @@ public class SwipeSensor {
 
 		// Compare all points to the mean
 		bool similar = true;
-		for (int i = 1; i < ns.Length; i++) {
+		for (int i = 0; i < ns.Length; i++) {
 			if ((ns[i] - nsMean).magnitude > threshold && (ns[i] != Vector2.zero ^ !ignoreZeroMagnitudes)) {
 				similar = false;
 				break;
