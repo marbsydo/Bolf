@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 enum BallStage {DoesNotExist, AwaitingRelease, InMotion};
-enum ReleaseStage {NoInput, Swiping, Released};
+enum ReleaseStage {Positioning, PulledBack, Released};
 
 public class Vector2TimeArray {
 	private Vector2[] position;
@@ -51,11 +51,13 @@ public class GameControls : MonoBehaviour {
 	Ball ball;
 	BallStage ballStage = BallStage.DoesNotExist;
 
-	ReleaseStage releaseStage = ReleaseStage.NoInput;
+	ReleaseStage releaseStage = ReleaseStage.Positioning;
 
 	Vector3[] markers;
 	Vector3 markersMid;
 	float markersLine;
+
+	float chosenX;
 
 	const float ballScalingModifier = 0.5f; // This is how much bigger the ball gets e.g. 1.5 = 150%
 	const float ballSinModifier = 2f;
@@ -107,22 +109,72 @@ public class GameControls : MonoBehaviour {
 			mPos = Input.mousePosition;
 			mPosWorld = Camera.main.ScreenToWorldPoint(new Vector3(mPos.x, mPos.y, -Camera.main.transform.position.z));
 
-			if (Input.GetMouseButtonDown(0)) {
-				ResetBall();
-			}
+			// Ball movement
 
-			if (Input.GetMouseButton(0)) {
-				swipeSensor.AddPoint((Vector2) mPosWorld);
-			}
+			if (releaseStage == ReleaseStage.Positioning || releaseStage == ReleaseStage.PulledBack) {
+				Vector3 newBallPos = ball.transform.position;
 
-			if (Input.GetMouseButtonUp(0)) {
-				if (lineExists) {
-					if (((Vector2) ball.transform.position - lineStart).magnitude < 2f) {
-						Vector3 forceVector = ((Vector3) lineVector.normalized) * (lineVector.magnitude / Mathf.Max(0.1f, lineTime));
-						ball.rigidbody.AddForce(forceVector, ForceMode.Impulse);
+				if (Input.GetMouseButton(0)) {
+					if (mPosWorld.y < markersLine - 1.5f) {
+						// Mouse button is held down at the bottom of the screen, so switch to PulledBack
+						releaseStage = ReleaseStage.PulledBack;
+						chosenX = ball.transform.position.x;
+					}
+
+					if (releaseStage == ReleaseStage.Positioning) {
+						// Mouse button is held down while in Positioning stage, so move ball in X position across markersLine
+						newBallPos.x = mPosWorld.x;
+						newBallPos.x = Mathf.Max(newBallPos.x, markers[0].x + 0.5f);
+						newBallPos.x = Mathf.Min(newBallPos.x, markers[1].x - 0.5f);
 					}
 				}
-				swipeSensor.ResetPoints();
+
+				if (releaseStage == ReleaseStage.Positioning) {
+					newBallPos.y = Mathf.Lerp(newBallPos.y, markersLine, Time.deltaTime * 5f);
+				}
+
+				// Release stage is PulledBack, so pull the ball back at the chosen position chosenX
+				// Also record the mouse movement in order to detect a swipe
+				if (releaseStage == ReleaseStage.PulledBack) {
+					newBallPos.x = chosenX;
+					newBallPos.y = Mathf.Lerp(newBallPos.y, markersLine - 2f, Time.deltaTime * 5f);
+					swipeSensor.AddPoint((Vector2) mPosWorld);
+				}
+
+				if (Input.GetMouseButtonUp(0)) {
+					if (releaseStage == ReleaseStage.PulledBack) {
+						if (mPosWorld.y <= markersLine) {
+							// Mouse was released within positioning area, so revert back to Positioning
+							releaseStage = ReleaseStage.Positioning;
+						} else {
+							// Mouse was released outside of positioning area, so fire if necessary
+							if (lineExists) {
+								// A straight line does exist, so fire the ball
+								Vector3 forceVector = ((Vector3) lineVector.normalized) * (lineVector.magnitude / Mathf.Max(0.1f, lineTime));
+								ball.rigidbody.AddForce(forceVector, ForceMode.Impulse);
+								releaseStage = ReleaseStage.Released;
+							} else {
+								// A straight line does not exist, so return to positioning
+								releaseStage = ReleaseStage.Positioning;
+							}
+							swipeSensor.ResetPoints();
+						}
+					}
+				}
+
+				// Update ball's position
+				ball.transform.position = newBallPos;
+				ball.transform.localScale = CalculateBallScale();
+			}
+
+			if (releaseStage == ReleaseStage.Released) {
+
+				ball.transform.localScale = Vector3.Lerp(ball.transform.localScale, Vector3.one, Time.deltaTime * 5f);
+
+				if (Input.GetMouseButtonDown(0)) {
+					ResetBall();
+					releaseStage = ReleaseStage.Positioning;
+				}
 			}
 		}
 	}
