@@ -109,6 +109,27 @@ public class GameControls : MonoBehaviour {
 			mPos = Input.mousePosition;
 			mPosWorld = Camera.main.ScreenToWorldPoint(new Vector3(mPos.x, mPos.y, -Camera.main.transform.position.z));
 
+			if (Input.GetMouseButtonDown(0)) {
+				if (ball.IsInHole()) {
+					ResetBall();
+					swipeSensor.ResetPoints();
+				}
+			}
+
+			if (Input.GetMouseButton(0)) {
+				swipeSensor.AddPoint((Vector2) mPosWorld);
+			}
+
+			if (Input.GetMouseButtonUp(0)) {
+				if (lineExists) {
+					Vector3 forceVector = ((Vector3) lineVector.normalized) * (lineVector.magnitude / Mathf.Max(0.1f, lineTime));
+					ball.rigidbody.AddForce(forceVector, ForceMode.Impulse);
+				}
+				swipeSensor.ResetPoints();
+			}
+
+
+			/*
 			// Ball movement
 
 			if (releaseStage == ReleaseStage.Positioning || releaseStage == ReleaseStage.PulledBack) {
@@ -176,6 +197,7 @@ public class GameControls : MonoBehaviour {
 					releaseStage = ReleaseStage.Positioning;
 				}
 			}
+			*/
 		}
 	}
 
@@ -226,6 +248,7 @@ public class SwipeSensor {
 	private float swipeHistoryTimeLast = -999;
 	private float swipeHistoryPosInterval = 0.5f;
 	private Vector2 swipeHistoryPosLast = Vector2.one * -999;
+	private float straightLineSensitivity = 0.5f; // The greater the value, the more leniant we are upon the definition of a "straight" line
 
 	// This function should be called constantly to inform SwipeSensor of the current swipe position
 	public void AddPoint(Vector2 point) {
@@ -261,7 +284,7 @@ public class SwipeSensor {
 		bool found = false;
 		for (int i = swipeHistoryLength; i >= minAllowedPoints; i--) {
 			ps = FirstXPoints(i);
-			if (ArePointsStraightish(ps.GetPositionArray(), 0.4f)) {
+			if (ArePointsStraightish(ps.GetPositionArray(), straightLineSensitivity)) {
 				found = true;
 				break;
 			}

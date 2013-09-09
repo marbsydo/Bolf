@@ -6,6 +6,7 @@ public class Ball : MonoBehaviour {
 	GameObject holes;
 
 	Hole targetHole;
+	bool isInHole = false;
 
 	float velocityThreshold1 = 5f;
 	float velocityThreshold2 = 7.5f;
@@ -61,6 +62,11 @@ public class Ball : MonoBehaviour {
 
 	public void GoInHole(Hole hole) {
 		targetHole = hole;
+		isInHole = true;
+	}
+
+	public bool IsInHole() {
+		return isInHole;
 	}
 
 	public void SetScale(Vector3 s) {
