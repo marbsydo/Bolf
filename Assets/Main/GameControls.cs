@@ -4,6 +4,48 @@ using System.Collections;
 enum BallStage {DoesNotExist, AwaitingRelease, InMotion};
 enum ReleaseStage {NoInput, Swiping, Released};
 
+public class Vector2TimeArray {
+	private Vector2[] position;
+	private float[] time;
+	private int length;
+
+	public Vector2TimeArray(int length) {
+		this.position = new Vector2[length];
+		this.time = new float[length];
+		this.length = length;
+	}
+
+	public Vector2 GetPosition(int i) {
+		return position[i];
+	}
+
+	public Vector2[] GetPositionArray() {
+		return position;
+	}
+
+	public float GetTime(int i) {
+		return time[i];
+	}
+
+	public float[] GetTimeArray() {
+		return time;
+	}
+
+	public int GetLength() {
+		return this.length;
+	}
+
+	public void SetElement(int i, Vector2 position, float time) {
+		this.position[i] = position;
+		this.time[i] = time;
+	}
+
+	public void CopyElement(int from, int to) {
+		this.position[to] = this.position[from];
+		this.time[to] = this.time[from];
+	}
+}
+
 public class GameControls : MonoBehaviour {
 	Object ballPrefab;
 	Ball ball;
@@ -39,21 +81,22 @@ public class GameControls : MonoBehaviour {
 		if (ballStage == BallStage.AwaitingRelease) {
 
 			// Get the current swipe
-			Vector2[] swipe = swipeSensor.GetLongestStraightishSwipe();
-			bool lineExists = (swipe.Length >= 2); // Must be at least 2 points for a line to exist in the swipe
+			Vector2TimeArray swipe = swipeSensor.GetLongestStraightishSwipe();
+			bool lineExists = (swipe.GetLength() >= 2); // Must be at least 2 points for a line to exist in the swipe
 			Vector2 lineStart = Vector2.zero;
 			Vector2 lineVector = Vector2.zero;
-			float lineTime = 1f; //TODO: Calculate time it took to draw the line
+			float lineTime = 0f;
 			if (lineExists) {
-				lineStart = swipe[swipe.Length - 1];
-				lineVector = swipe[0] - lineStart;
+				lineStart = swipe.GetPosition(swipe.GetLength() - 1);
+				lineVector = swipe.GetPosition(0) - lineStart;
+				lineTime = swipe.GetTime(swipe.GetLength() - 1) - swipe.GetTime(0);
 			}
 
 			// Draw debug swipe (black = raw; white = inferred line)
 			if (Debug.isDebugBuild) {
 				if (lineExists) {
-					for (int i = 0; i < swipe.Length - 1; i++) {
-						Debug.DrawLine((Vector3) swipe[i], (Vector3) swipe[i + 1], Color.black);
+					for (int i = 0; i < swipe.GetLength() - 1; i++) {
+						Debug.DrawLine((Vector3) swipe.GetPosition(i), (Vector3) swipe.GetPosition(i + 1), Color.black);
 					}
 					Debug.DrawLine((Vector3) lineStart, (Vector3) (lineStart + lineVector), Color.white);
 				}
@@ -75,7 +118,7 @@ public class GameControls : MonoBehaviour {
 			if (Input.GetMouseButtonUp(0)) {
 				if (lineExists) {
 					if (((Vector2) ball.transform.position - lineStart).magnitude < 2f) {
-						Vector3 forceVector = ((Vector3) lineVector.normalized) * (lineVector.magnitude / lineTime);
+						Vector3 forceVector = ((Vector3) lineVector.normalized) * (lineVector.magnitude / Mathf.Max(0.1f, lineTime));
 						ball.rigidbody.AddForce(forceVector, ForceMode.Impulse);
 					}
 				}
@@ -119,7 +162,6 @@ public class GameControls : MonoBehaviour {
 */
 
 public class SwipeSensor {
-
 	// if timeLimited is true, then
 	//   swipeHistoryLengthMax * swipeHistoryTimeInterval = how many seconds of history are recorded
 
@@ -127,7 +169,7 @@ public class SwipeSensor {
 	private const int swipeHistoryLengthMax = 40;
 	private int swipeHistoryLength;
 	private const int minAllowedPoints = 4;
-	private Vector2[] swipeHistory = new Vector2[swipeHistoryLengthMax];
+	private Vector2TimeArray swipeHistory = new Vector2TimeArray(swipeHistoryLengthMax);
 	private float swipeHistoryTimeInterval = 0.05f;
 	private float swipeHistoryTimeLast = -999;
 	private float swipeHistoryPosInterval = 0.5f;
@@ -143,9 +185,10 @@ public class SwipeSensor {
 			swipeHistoryPosLast = point;
 
 			for (int i = swipeHistoryLengthMax - 2; i >= 0; i--) {
-				swipeHistory[i + 1] = swipeHistory[i];
+				swipeHistory.CopyElement(i, i + 1);
 			}
-			swipeHistory[0] = point;
+			swipeHistory.SetElement(0, point, Time.timeSinceLevelLoad);
+
 			swipeHistoryLength++;
 			if (swipeHistoryLength > swipeHistoryLengthMax)
 				swipeHistoryLength = swipeHistoryLengthMax;
@@ -157,31 +200,31 @@ public class SwipeSensor {
 	}
 
 	public void ResetPoints() {
-		swipeHistory = new Vector2[swipeHistoryLengthMax];
+		swipeHistory = new Vector2TimeArray(swipeHistoryLengthMax);
 		swipeHistoryLength = 0;
 	}
 
-	public Vector2[] GetLongestStraightishSwipe() {
-		Vector2[] ps = new Vector2[0];
+	public Vector2TimeArray GetLongestStraightishSwipe() {
+		Vector2TimeArray ps = new Vector2TimeArray(0);
 		bool found = false;
 		for (int i = swipeHistoryLength; i >= minAllowedPoints; i--) {
 			ps = FirstXPoints(i);
-			if (ArePointsStraightish(ps, 0.4f)) {
+			if (ArePointsStraightish(ps.GetPositionArray(), 0.4f)) {
 				found = true;
 				break;
 			}
 		}
 		if (!found)
-			ps = new Vector2[0];
+			ps = new Vector2TimeArray(0);
 		return ps;
 	}
 
-	public Vector2[] FirstXPoints(int numPoints) {
+	public Vector2TimeArray FirstXPoints(int numPoints) {
 
 		// Returns the first X number of points from the swipeHistory
-		Vector2[] xPoints = new Vector2[Mathf.Min(numPoints, swipeHistoryLength)];
-		for (int i = 0; i < xPoints.Length; i++) {
-			xPoints[i] = swipeHistory[i];
+		Vector2TimeArray xPoints = new Vector2TimeArray(Mathf.Min(numPoints, swipeHistoryLength));
+		for (int i = 0; i < xPoints.GetLength(); i++) {
+			xPoints.SetElement(i, swipeHistory.GetPosition(i), swipeHistory.GetTime(i));
 		}
 
 		return xPoints;
