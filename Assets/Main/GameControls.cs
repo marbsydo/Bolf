@@ -61,7 +61,12 @@ public class GameControls : MonoBehaviour {
 		ballPrefab = Resources.Load("Ball");
 
 		GameObject temp = GameObject.Find("Ball") as GameObject;
-		ballStartPosition = temp.transform.position;
+		if (temp != null) {
+			ballStartPosition = temp.transform.position;
+		} else {
+			Debug.LogWarning("No ball in scene");
+			ballStartPosition = Vector3.zero;
+		}
 		Destroy(temp);
 	}
 
