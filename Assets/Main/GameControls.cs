@@ -4,48 +4,6 @@ using System.Collections;
 enum BallStage {DoesNotExist, AwaitingRelease, InMotion};
 enum ReleaseStage {Positioning, PulledBack, Released};
 
-public class Vector2TimeArray {
-	private Vector2[] position;
-	private float[] time;
-	private int length;
-
-	public Vector2TimeArray(int length) {
-		this.position = new Vector2[length];
-		this.time = new float[length];
-		this.length = length;
-	}
-
-	public Vector2 GetPosition(int i) {
-		return position[i];
-	}
-
-	public Vector2[] GetPositionArray() {
-		return position;
-	}
-
-	public float GetTime(int i) {
-		return time[i];
-	}
-
-	public float[] GetTimeArray() {
-		return time;
-	}
-
-	public int GetLength() {
-		return this.length;
-	}
-
-	public void SetElement(int i, Vector2 position, float time) {
-		this.position[i] = position;
-		this.time[i] = time;
-	}
-
-	public void CopyElement(int from, int to) {
-		this.position[to] = this.position[from];
-		this.time[to] = this.time[from];
-	}
-}
-
 public class GameControls : MonoBehaviour {
 
 	GUIScore guiScore;
@@ -57,10 +15,12 @@ public class GameControls : MonoBehaviour {
 	ReleaseStage releaseStage = ReleaseStage.Positioning;
 
 	SwipeSensor swipeSensor = new SwipeSensor();
+	TouchInput touchInput;
 
 	Vector3 ballStartPosition;
 
 	void Awake() {
+		touchInput = new TouchInput(GameObject.Find("GUICamera"));
 		guiScore = (GameObject.Find("GUIScore") as GameObject).GetComponent<GUIScore>();
 
 		ballPrefab = Resources.Load("Ball");
@@ -109,22 +69,22 @@ public class GameControls : MonoBehaviour {
 			mPos = Input.mousePosition;
 			mPosWorld = Camera.main.ScreenToWorldPoint(new Vector3(mPos.x, mPos.y, -Camera.main.transform.position.z));
 
+/*
 			// If the ball is in the hole, touch to reset
-			if (Input.GetMouseButtonDown(0)) {
+			if (touchInput.Down()) {
 				if (ball.IsInHole()) {
-					ResetBall();
-					swipeSensor.ResetPoints();
-					guiScore.ResetStrokes();
+					ResetAll();
 				}
 			}
+*/
 
 			// If touching, add point to swipeSensor
-			if (Input.GetMouseButton(0)) {
+			if (touchInput.Stay()) {
 				swipeSensor.AddPoint((Vector2) mPosWorld);
 			}
 
 			// If released touch, fire if necessary
-			if (Input.GetMouseButtonUp(0)) {
+			if (touchInput.Up()) {
 				if (lineExists) {
 					Vector3 forceVector = ((Vector3) lineVector.normalized) * (lineVector.magnitude / Mathf.Max(0.1f, lineTime));
 					ball.rigidbody.AddForce(forceVector, ForceMode.Impulse);
@@ -133,6 +93,12 @@ public class GameControls : MonoBehaviour {
 				swipeSensor.ResetPoints();
 			}
 		}
+	}
+
+	public void ResetAll() {
+		ResetBall();
+		swipeSensor.ResetPoints();
+		guiScore.ResetStrokes();
 	}
 
 	void ResetBall() {
@@ -158,12 +124,46 @@ public class GameControls : MonoBehaviour {
 	}
 }
 
-/*
-1) Write a generic script to detect the speed and direction of mouse/touch input over the last X seconds
-1b) Make the script able to tell for how many X seconds the mouse/touch input has not changed direction by more than e.g. 20 degrees
-2) Make the ball following the mouse/touch like normal in the Input.GetMouseButton(0) code below
-3) If the finger crosses the line, take the speed and direction from the last "straight line" as decided in 1b) and fire the ball accordingly
-*/
+public class TouchInput {
+
+	GameObject guiCamera;
+	Vector2 halfWidth = Vector2.zero;
+
+	// yes this is awful code and it should actually read the height from the object
+	const float heightOfBlackBar = 2f;	// height of the black bar at the top of the GUI
+
+	public TouchInput(GameObject guiCamera) {
+		Init(guiCamera);
+	}
+
+	private void Init(GameObject guiCamera) {
+		this.guiCamera = guiCamera;
+		halfWidth.x = ((float) guiCamera.camera.orthographicSize / Screen.height) * Screen.width;
+		halfWidth.y = ((float) guiCamera.camera.orthographicSize);
+	}
+
+	public bool TouchWithinArea() {
+		Vector3 mPos, mPosWorld, mPosWGUI; // mPos = mouse coords in screen space; mPosWorld = mouse coords in world space, mPosWGUI = mouse coords in world space of the GUI camera
+
+		mPos = Input.mousePosition;
+		mPosWorld = Camera.main.ScreenToWorldPoint(new Vector3(mPos.x, mPos.y, -Camera.main.transform.position.z));
+		mPosWGUI = guiCamera.camera.ScreenToWorldPoint(new Vector3(mPos.x, mPos.y, -guiCamera.transform.position.z));
+
+		return (mPosWGUI.y < guiCamera.transform.position.y + halfWidth.y - heightOfBlackBar);
+	}
+
+	public bool Down() {
+		return (TouchWithinArea() && Input.GetMouseButtonDown(0));
+	}
+
+	public bool Stay() {
+		return (TouchWithinArea() && Input.GetMouseButton(0));
+	}
+
+	public bool Up() {
+		return (TouchWithinArea() && Input.GetMouseButtonUp(0));
+	}
+}
 
 public class SwipeSensor {
 	// if timeLimited is true, then
@@ -284,5 +284,47 @@ public class SwipeSensor {
 		}
 
 		return similar;
+	}
+}
+
+public class Vector2TimeArray {
+	private Vector2[] position;
+	private float[] time;
+	private int length;
+
+	public Vector2TimeArray(int length) {
+		this.position = new Vector2[length];
+		this.time = new float[length];
+		this.length = length;
+	}
+
+	public Vector2 GetPosition(int i) {
+		return position[i];
+	}
+
+	public Vector2[] GetPositionArray() {
+		return position;
+	}
+
+	public float GetTime(int i) {
+		return time[i];
+	}
+
+	public float[] GetTimeArray() {
+		return time;
+	}
+
+	public int GetLength() {
+		return this.length;
+	}
+
+	public void SetElement(int i, Vector2 position, float time) {
+		this.position[i] = position;
+		this.time[i] = time;
+	}
+
+	public void CopyElement(int from, int to) {
+		this.position[to] = this.position[from];
+		this.time[to] = this.time[from];
 	}
 }
