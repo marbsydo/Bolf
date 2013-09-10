@@ -89,7 +89,6 @@ public class GameControls : MonoBehaviour {
 			if (touchInput.Up()) {
 				if (lineExists) {
 					if (!ball.IsInHole()) {
-						Debug.Log("Draw line in " + lineTime);
 						Vector3 forceVector = ((Vector3) lineVector.normalized) * (lineVector.magnitude / Mathf.Max(0.1f, lineTime) * speedMultiplier);
 						ball.rigidbody.AddForce(forceVector, ForceMode.Impulse);
 						guiScore.IncStrokes();

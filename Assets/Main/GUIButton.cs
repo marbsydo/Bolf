@@ -26,7 +26,6 @@ public class GUIButton : MonoBehaviour {
 		if (Input.GetMouseButtonDown(0)) {
 			if (PosNearButton(mPosWorld, buttonRadius)) {
 				pressed = true;
-				Debug.Log("PRESSED" + Random.value);
 			}
 		}
 
