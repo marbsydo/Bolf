@@ -19,6 +19,8 @@ public class GameControls : MonoBehaviour {
 
 	Vector3 ballStartPosition;
 
+	float speedMultiplier = 2f;
+
 	void Awake() {
 		touchInput = new TouchInput(GameObject.Find("GUICamera"));
 		guiScore = (GameObject.Find("GUIScore") as GameObject).GetComponent<GUIScore>();
@@ -51,7 +53,7 @@ public class GameControls : MonoBehaviour {
 			if (lineExists) {
 				lineStart = swipe.GetPosition(swipe.GetLength() - 1);
 				lineVector = swipe.GetPosition(0) - lineStart;
-				lineTime = swipe.GetTime(swipe.GetLength() - 1) - swipe.GetTime(0);
+				lineTime = swipe.GetTime(0) - swipe.GetTime(swipe.GetLength() - 1);
 			}
 
 			// Draw debug swipe (black = raw; white = inferred line)
@@ -87,7 +89,8 @@ public class GameControls : MonoBehaviour {
 			if (touchInput.Up()) {
 				if (lineExists) {
 					if (!ball.IsInHole()) {
-						Vector3 forceVector = ((Vector3) lineVector.normalized) * (lineVector.magnitude / Mathf.Max(0.1f, lineTime));
+						Debug.Log("Draw line in " + lineTime);
+						Vector3 forceVector = ((Vector3) lineVector.normalized) * (lineVector.magnitude / Mathf.Max(0.1f, lineTime) * speedMultiplier);
 						ball.rigidbody.AddForce(forceVector, ForceMode.Impulse);
 						guiScore.IncStrokes();
 					}
@@ -159,11 +162,11 @@ public class TouchInput {
 	}
 
 	public bool Stay() {
-		return (TouchWithinArea() && Input.GetMouseButton(0));
+		return (Input.GetMouseButton(0));
 	}
 
 	public bool Up() {
-		return (TouchWithinArea() && Input.GetMouseButtonUp(0));
+		return (Input.GetMouseButtonUp(0));
 	}
 }
 
