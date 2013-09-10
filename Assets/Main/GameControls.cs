@@ -86,9 +86,11 @@ public class GameControls : MonoBehaviour {
 			// If released touch, fire if necessary
 			if (touchInput.Up()) {
 				if (lineExists) {
-					Vector3 forceVector = ((Vector3) lineVector.normalized) * (lineVector.magnitude / Mathf.Max(0.1f, lineTime));
-					ball.rigidbody.AddForce(forceVector, ForceMode.Impulse);
-					guiScore.IncStrokes();
+					if (!ball.IsInHole()) {
+						Vector3 forceVector = ((Vector3) lineVector.normalized) * (lineVector.magnitude / Mathf.Max(0.1f, lineTime));
+						ball.rigidbody.AddForce(forceVector, ForceMode.Impulse);
+						guiScore.IncStrokes();
+					}
 				}
 				swipeSensor.ResetPoints();
 			}
