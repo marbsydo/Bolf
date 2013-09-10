@@ -47,6 +47,9 @@ public class Vector2TimeArray {
 }
 
 public class GameControls : MonoBehaviour {
+
+	GUIScore guiScore;
+		
 	Object ballPrefab;
 	Ball ball;
 	BallStage ballStage = BallStage.DoesNotExist;
@@ -58,6 +61,8 @@ public class GameControls : MonoBehaviour {
 	Vector3 ballStartPosition;
 
 	void Awake() {
+		guiScore = (GameObject.Find("GUIScore") as GameObject).GetComponent<GUIScore>();
+
 		ballPrefab = Resources.Load("Ball");
 
 		GameObject temp = GameObject.Find("Ball") as GameObject;
@@ -109,6 +114,7 @@ public class GameControls : MonoBehaviour {
 				if (ball.IsInHole()) {
 					ResetBall();
 					swipeSensor.ResetPoints();
+					guiScore.ResetStrokes();
 				}
 			}
 
@@ -122,6 +128,7 @@ public class GameControls : MonoBehaviour {
 				if (lineExists) {
 					Vector3 forceVector = ((Vector3) lineVector.normalized) * (lineVector.magnitude / Mathf.Max(0.1f, lineTime));
 					ball.rigidbody.AddForce(forceVector, ForceMode.Impulse);
+					guiScore.IncStrokes();
 				}
 				swipeSensor.ResetPoints();
 			}

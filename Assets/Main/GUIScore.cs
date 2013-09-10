@@ -1,0 +1,36 @@
+using UnityEngine;
+using System.Collections;
+
+public class GUIScore : MonoBehaviour {
+
+	int strokes = 0;
+	int par;
+
+	void Awake() {
+		par = GetPar(Application.loadedLevelName);
+	}
+
+	public void IncStrokes() {
+		strokes++;
+	}
+
+	public void ResetStrokes() {
+		strokes = 0;
+	}
+
+	void Update() {
+		guiText.text = "Par: " + par + "\nStrokes: " + strokes;
+	}
+
+	int GetPar(string levelName) {
+		int par = 1;
+		if (levelName == "level_1") {
+			par = 1;
+		} else if (levelName == "level_2") {
+			par = 2;
+		} else {
+			Debug.LogWarning("Unknown level: " + levelName);
+		}
+		return par;
+	}
+}

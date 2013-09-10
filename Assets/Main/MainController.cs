@@ -2,7 +2,9 @@ using UnityEngine;
 using System.Collections;
 
 public class MainController : MonoBehaviour {
+
 	void Awake() {
+
 		GameObject floorSprite = Resources.Load("Sprites/FloorSprite") as GameObject;
 		GameObject floorLineSprite = Resources.Load("Sprites/FloorLineSprite") as GameObject;
 

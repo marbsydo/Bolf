@@ -15,7 +15,7 @@
    version="1.1"
    inkscape:version="0.48.2 r9819"
    sodipodi:docname="block_4h.svg"
-   inkscape:export-filename="C:\Users\Muffin\Documents\GitHub\Bolf\Assets\Art\GameAtlas\block_4w.png"
+   inkscape:export-filename="C:\Users\Muffin\Documents\GitHub\Bolf\Assets\Art\GameAtlas\block_4h.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -46,7 +46,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
