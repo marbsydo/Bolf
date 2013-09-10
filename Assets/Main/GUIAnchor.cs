@@ -5,7 +5,7 @@ public enum GUIAnchorX {Left, Middle, Right}
 public enum GUIAnchorY {Top, Middle, Bottom}
 public enum GUILayer {LayerTop, Layer2, Layer3, LayerMiddle, Layer5, Layer6, LayerBottom};
 
-public class GUIButton : MonoBehaviour {
+public class GUIAnchor : MonoBehaviour {
 
 	public GUIAnchorX anchorX = GUIAnchorX.Middle;
 	public GUIAnchorY anchorY = GUIAnchorY.Middle;
