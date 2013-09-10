@@ -3,12 +3,14 @@ using System.Collections;
 
 public enum GUIAnchorX {Left, Middle, Right}
 public enum GUIAnchorY {Top, Middle, Bottom}
+public enum GUILayer {LayerTop, Layer2, Layer3, LayerMiddle, Layer5, Layer6, LayerBottom};
 
 public class GUIButton : MonoBehaviour {
 
 	public GUIAnchorX anchorX = GUIAnchorX.Middle;
 	public GUIAnchorY anchorY = GUIAnchorY.Middle;
 	public Vector2 offset = Vector2.zero;
+	public GUILayer layer = GUILayer.LayerMiddle;
 
 	GameObject guiCamera;
 
@@ -38,6 +40,6 @@ public class GUIButton : MonoBehaviour {
 		case GUIAnchorY.Bottom:		anchorOffset.y = -halfWidth.y;		break;	
 		}
 
-		transform.position = guiCamera.transform.position + new Vector3(anchorOffset.x + offset.x, anchorOffset.y + offset.y, 10f);
+		transform.position = guiCamera.transform.position + new Vector3(anchorOffset.x + offset.x, anchorOffset.y + offset.y, 10f + ((int) layer));
 	}
 }
