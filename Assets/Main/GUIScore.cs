@@ -3,6 +3,8 @@ using System.Collections;
 
 public class GUIScore : MonoBehaviour {
 
+	public GUIText t;
+
 	int strokes = 0;
 	int par;
 
@@ -19,7 +21,7 @@ public class GUIScore : MonoBehaviour {
 	}
 
 	void Update() {
-		guiText.text = "Par: " + par + "\nStrokes: " + strokes;
+		t.text = "Par: " + par + "\nStrokes: " + strokes;
 	}
 
 	int GetPar(string levelName) {
