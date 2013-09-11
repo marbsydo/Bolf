@@ -1,17 +1,19 @@
 using UnityEngine;
 using System.Collections;
 
-public enum MenuButtonAction {Play, Levels, WorldLawn, WorldPinball, WorldSky, WorldSpace, __Length}
+public enum MenuButtonAction {MenuMain, MenuWorlds, MenuLevels, MenuSettings, WorldLawn, WorldPinball, WorldSky, WorldSpace, ActionPlay, __Length}
 
 public class MenuButton : MonoBehaviour {
 
-	public MenuButtonAction buttonAction = MenuButtonAction.Play;
+	public MenuButtonAction buttonAction = MenuButtonAction.MenuMain;
 
 	Camera cam;
+	MenuCamera menuCamera;
 	bool pressed;
 
 	void Awake() {
 		cam = (GameObject.Find("MenuCamera") as GameObject).GetComponent<Camera>() as Camera;
+		menuCamera = cam.gameObject.GetComponent<MenuCamera>();
 	}
 
 	void Update() {
@@ -49,9 +51,18 @@ public class MenuButton : MonoBehaviour {
 		Debug.Log("Doing action for " + buttonAction);
 		// Perform the button action
 		switch (buttonAction) {
-		case MenuButtonAction.Levels:
-			// Switch to levels
-			cam.gameObject.GetComponent<MenuCamera>().SetMenuScreen(MenuScreen.Worlds);
+		case MenuButtonAction.MenuWorlds:
+			menuCamera.SetMenuScreen(MenuScreen.Worlds);
+			break;
+		case MenuButtonAction.MenuMain:
+			menuCamera.SetMenuScreen(MenuScreen.Main);
+			break;
+		case MenuButtonAction.MenuLevels:
+			menuCamera.SetMenuScreen(MenuScreen.Levels);
+			break;
+		case MenuButtonAction.MenuSettings:
+			//TODO: Settings page does not exist yet
+			//menuCamera.SetMenuScreen(MenuScreen.Settings);
 			break;
 		}
 	}
