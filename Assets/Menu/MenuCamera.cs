@@ -9,6 +9,8 @@ public class MenuCamera : MonoBehaviour {
 	MenuScreen menuScreen = MenuScreen.Main;
 	BlackAction blackAction = BlackAction.None;
 
+	MenuLevelsController menuLevelsController;
+
 	Color colorStart;
 	Color colorBlack;
 	Color colorWorlds;
@@ -19,6 +21,8 @@ public class MenuCamera : MonoBehaviour {
 		colorStart = camera.backgroundColor;
 		colorBlack = Color.black;
 		colorWorlds = new Color(0.46875f, 0f, 0.734375f);
+
+		menuLevelsController = (GameObject.Find("MenuLevelsController") as GameObject).GetComponent<MenuLevelsController>();
 	}
 
 	void Update() {
@@ -39,7 +43,8 @@ public class MenuCamera : MonoBehaviour {
 		case MenuScreen.Levels:
 			targetRotationY = 180;
 			targetRotationX = 0;
-			targetColor = colorStart;
+			//targetColor = colorStart;
+			targetColor = menuLevelsController.GetDesiredBackgroundColor();
 			break;
 		case MenuScreen.Settings:
 			targetRotationY = 270;

@@ -10,10 +10,13 @@ public class MenuButton : MonoBehaviour {
 	Camera cam;
 	MenuCamera menuCamera;
 	bool pressed;
+	MenuLevelsController menuLevelsController;
 
 	void Awake() {
 		cam = (GameObject.Find("MenuCamera") as GameObject).GetComponent<Camera>() as Camera;
 		menuCamera = cam.gameObject.GetComponent<MenuCamera>();
+
+		menuLevelsController = (GameObject.Find("MenuLevelsController") as GameObject).GetComponent<MenuLevelsController>();
 	}
 
 	void Update() {
@@ -71,6 +74,22 @@ public class MenuButton : MonoBehaviour {
 		case MenuButtonAction.ActionQuit:
 			menuCamera.SetMenuScreen(MenuScreen.Black);
 			menuCamera.SetBlackAction(BlackAction.Quit);
+			break;
+		case MenuButtonAction.WorldLawn:
+			menuLevelsController.SetGameWorld(GameWorld.Lawn);
+			menuCamera.SetMenuScreen(MenuScreen.Levels);
+			break;
+		case MenuButtonAction.WorldPinball:
+			menuLevelsController.SetGameWorld(GameWorld.Pinball);
+			menuCamera.SetMenuScreen(MenuScreen.Levels);
+			break;
+		case MenuButtonAction.WorldSky:
+			menuLevelsController.SetGameWorld(GameWorld.Sky);
+			menuCamera.SetMenuScreen(MenuScreen.Levels);
+			break;
+		case MenuButtonAction.WorldSpace:
+			menuLevelsController.SetGameWorld(GameWorld.Space);
+			menuCamera.SetMenuScreen(MenuScreen.Levels);
 			break;
 		}
 	}
