@@ -38,4 +38,8 @@ public class MenuCamera : MonoBehaviour {
 				menuScreen = (MenuScreen) MenuScreen.__Length - 1;
 		}
 	}
+
+	public void SetMenuScreen(MenuScreen menuScreen) {
+		this.menuScreen = menuScreen;
+	}
 }
