@@ -11,12 +11,14 @@ public class MenuCamera : MonoBehaviour {
 
 	Color colorStart;
 	Color colorBlack;
+	Color colorWorlds;
 
 	private const float blackAngle = 80; // The angle the camera rotates down in the X direction when it fades to black
 
 	void Awake() {
 		colorStart = camera.backgroundColor;
 		colorBlack = Color.black;
+		colorWorlds = new Color(0.46875f, 0f, 0.734375f);
 	}
 
 	void Update() {
@@ -32,7 +34,7 @@ public class MenuCamera : MonoBehaviour {
 		case MenuScreen.Worlds:
 			targetRotationY = 90;
 			targetRotationX = 0;
-			targetColor = colorStart;
+			targetColor = colorWorlds;
 			break;
 		case MenuScreen.Levels:
 			targetRotationY = 180;
