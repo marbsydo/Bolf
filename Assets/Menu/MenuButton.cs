@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public enum MenuButtonAction {MenuMain, MenuWorlds, MenuLevels, MenuSettings, WorldLawn, WorldPinball, WorldSky, WorldSpace, ActionPlay, __Length}
+public enum MenuButtonAction {MenuMain, MenuWorlds, MenuLevels, MenuSettings, MenuBlack, WorldLawn, WorldPinball, WorldSky, WorldSpace, ActionPlay, ActionQuit, __Length}
 
 public class MenuButton : MonoBehaviour {
 
@@ -63,6 +63,14 @@ public class MenuButton : MonoBehaviour {
 		case MenuButtonAction.MenuSettings:
 			//TODO: Settings page does not exist yet
 			//menuCamera.SetMenuScreen(MenuScreen.Settings);
+			break;
+		case MenuButtonAction.ActionPlay:
+			menuCamera.SetMenuScreen(MenuScreen.Black);
+			menuCamera.SetBlackAction(BlackAction.Play);
+			break;
+		case MenuButtonAction.ActionQuit:
+			menuCamera.SetMenuScreen(MenuScreen.Black);
+			menuCamera.SetBlackAction(BlackAction.Quit);
 			break;
 		}
 	}
