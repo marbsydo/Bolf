@@ -1,11 +1,12 @@
 using UnityEngine;
 using System.Collections;
 
-public enum MenuButtonAction {MenuMain, MenuWorlds, MenuLevels, MenuSettings, MenuBlack, WorldLawn, WorldPinball, WorldSky, WorldSpace, ActionPlay, ActionQuit, __Length}
+public enum MenuButtonAction {MenuMain, MenuWorlds, MenuLevels, MenuSettings, MenuBlack, WorldLawn, WorldPinball, WorldSky, WorldSpace, ActionPlay, ActionQuit, ActionLevel, __Length}
 
 public class MenuButton : MonoBehaviour {
 
 	public MenuButtonAction buttonAction = MenuButtonAction.MenuMain;
+	public int levelNumber;
 
 	Camera cam;
 	MenuCamera menuCamera;
@@ -21,16 +22,27 @@ public class MenuButton : MonoBehaviour {
 		menuLevelsController = (GameObject.Find("MenuLevelsController") as GameObject).GetComponent<MenuLevelsController>();
 	}
 
+	public void SetLevelNumber(int levelNumber) {
+		if (buttonAction == MenuButtonAction.ActionLevel) {
+			this.levelNumber = levelNumber;
+		} else {
+			Debug.LogWarning("Tried to assign a levelNumber to a button that has nothing to do with levelNumber");
+		}
+	}
+
 	void Update() {
+
+		bool wasHitThisFrame = WasHitThisFrame();
+
 		if (Input.GetMouseButtonDown(0)) {
-			if (TouchOverButton()) {
+			if (wasHitThisFrame) {
 				// Player has pressed down on the button
 				pressed = true;
 			}
 		}
 
 		if (pressed) {
-			if (!TouchOverButton()) {
+			if (!wasHitThisFrame) {
 				// Touch has moved off button
 				pressed = false;
 			}
@@ -100,13 +112,21 @@ public class MenuButton : MonoBehaviour {
 		hitThisFrame = true;
 	}
 
-	void LateUpdate() {
+	void ResetHitThisFrame() {
 		hitThisFrame = false;
 	}
 
+	bool WasHitThisFrame() {
+		bool wasHit = hitThisFrame;
+		hitThisFrame = false;
+		return wasHit;
+	}
+
+	/*
 	bool TouchOverButton() {
 		return hitThisFrame;
 	}
+	*/
 
 	/*
 	// TODO: this function is awful because every single button in the scene calls it!!!

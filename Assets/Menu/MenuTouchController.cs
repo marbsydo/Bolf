@@ -32,6 +32,7 @@ public class MenuTouchController : MonoBehaviour {
 	void TellColliderTheyAreHit(Collider collider) {
 		MenuButton menuButton = collider.gameObject.GetComponent<MenuButton>() as MenuButton;
 		if (menuButton != null) {
+			//Debug.Log("Telling " + collider.gameObject.name + "! " + Random.value);
 			menuButton.HitThisFrame();
 		}
 	}
