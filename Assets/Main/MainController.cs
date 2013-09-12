@@ -3,6 +3,17 @@ using System.Collections;
 
 public enum GameWorld {Lawn, Pinball, Sky, Space}
 
+public class SpecificLevel {
+
+	public GameWorld gameWorld;
+	public int levelNumber;
+
+	public SpecificLevel(GameWorld gameWorld, int levelNumber) {
+		this.gameWorld = gameWorld;
+		this.levelNumber = levelNumber;
+	}
+}
+
 public class MainController : MonoBehaviour {
 
 	void Awake() {
@@ -38,13 +49,13 @@ public class MainController : MonoBehaviour {
 		*/
 	}
 
-	public void PlayLevel(GameWorld gameWorld, int levelNumber) {
+	public void PlayLevel(SpecificLevel specificLevel) {
 		// Check number is valid
-		if (IsValidLevelNumber(levelNumber)) {
+		if (IsValidLevelNumber(specificLevel.levelNumber)) {
 			//TODO: Might want to verify that the world is valid
-			Application.LoadLevel("level_" + GameWorldToString(gameWorld) + "_" + levelNumber);
+			Application.LoadLevel("level_" + GameWorldToString(specificLevel.gameWorld) + "_" + specificLevel.levelNumber);
 		} else {
-			Debug.LogWarning("Could not load level. Number is invalid: " + levelNumber);
+			Debug.LogWarning("Could not load level. Number is invalid: " + specificLevel.levelNumber);
 		}
 	}
 

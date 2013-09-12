@@ -3,13 +3,16 @@ using System.Collections;
 
 public enum MenuScreen {Main, Worlds, Levels, Settings, Black, __Length}
 
-public enum BlackAction {None, Play, Quit, __Length};
+public enum BlackAction {None, PlayNextLevel, PlaySpecificLevel, Quit, __Length};
 
 public class MenuCamera : MonoBehaviour {
 	MenuScreen menuScreen = MenuScreen.Main;
 	BlackAction blackAction = BlackAction.None;
 
 	MenuLevelsController menuLevelsController;
+	MainController mainController;
+
+	SpecificLevel specificLevel;
 
 	Color colorStart;
 	Color colorBlack;
@@ -23,6 +26,7 @@ public class MenuCamera : MonoBehaviour {
 		colorWorlds = new Color(0.46875f, 0f, 0.734375f);
 
 		menuLevelsController = (GameObject.Find("MenuLevelsController") as GameObject).GetComponent<MenuLevelsController>();
+		mainController = (GameObject.Find("MainController") as GameObject).GetComponent<MainController>();
 	}
 
 	void Update() {
@@ -101,7 +105,7 @@ public class MenuCamera : MonoBehaviour {
 			Debug.LogWarning("No action defined!");
 			SetMenuScreen(MenuScreen.Main);
 			break;
-		case BlackAction.Play:
+		case BlackAction.PlayNextLevel:
 			// Play next level
 			Application.LoadLevel("level_1");
 			goto case BlackAction.None;
@@ -110,7 +114,15 @@ public class MenuCamera : MonoBehaviour {
 			Debug.Log("Game has ended.");
 			Application.Quit();
 			break;
+		case BlackAction.PlaySpecificLevel:
+			// play the specific level
+			mainController.PlayLevel(this.specificLevel);
+			break;
 		}
+	}
+
+	public void SetSpecificLevel(SpecificLevel specificLevel) {
+		this.specificLevel = specificLevel;
 	}
 
 	public void SetMenuScreen(MenuScreen menuScreen) {

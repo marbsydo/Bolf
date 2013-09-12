@@ -87,7 +87,7 @@ public class MenuButton : MonoBehaviour {
 			break;
 		case MenuButtonAction.ActionPlay:
 			menuCamera.SetMenuScreen(MenuScreen.Black);
-			menuCamera.SetBlackAction(BlackAction.Play);
+			menuCamera.SetBlackAction(BlackAction.PlayNextLevel);
 			break;
 		case MenuButtonAction.ActionQuit:
 			menuCamera.SetMenuScreen(MenuScreen.Black);
@@ -95,7 +95,9 @@ public class MenuButton : MonoBehaviour {
 			break;
 		case MenuButtonAction.ActionLevel:
 			// Play the level
-			mainController.PlayLevel(menuLevelsController.GetGameWorld(), levelNumber);
+			menuCamera.SetMenuScreen(MenuScreen.Black);
+			menuCamera.SetBlackAction(BlackAction.PlaySpecificLevel);
+			menuCamera.SetSpecificLevel(new SpecificLevel(menuLevelsController.GetGameWorld(), levelNumber));
 			break;
 		case MenuButtonAction.WorldLawn:
 			menuLevelsController.SetGameWorld(GameWorld.Lawn);
