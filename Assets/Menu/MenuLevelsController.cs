@@ -13,15 +13,28 @@ public class MenuLevelsController : MonoBehaviour {
 		Vector3 middle =  transform.position + new Vector3(3f, 4f, 0f);
 		int level = 1;
 
+		Quaternion rot = Quaternion.Euler(0f, 180f, 0f);
+
 		// rows of 4 3 4 3 4
 		for (int row = 0; row < 5; row++) {
 			int colSize = 3 + (1 - (row % 2));
 			for (int col = 0; col < colSize; col++) {
-				GameObject obj = GameObject.Instantiate(prefabButtonlevel, middle + new Vector3(col * -2f + (colSize == 3 ? -1f : 0f), row * -1.5f, 0f), Quaternion.Euler(180f, 0f, 0f)) as GameObject;
+				GameObject obj = GameObject.Instantiate(prefabButtonlevel, middle + new Vector3(col * -2f + (colSize == 3 ? -1f : 0f), row * -1.5f, 0f), rot) as GameObject;
 
 				// Change the object's name and assign it its level number
 				obj.name = "Level" + level;
 				obj.GetComponent<MenuButton>().SetLevelNumber(level);
+
+				// Create a number sprite in front of it
+				string spriteName ="Numbers/SpriteNumber" + level;
+				Object numberPrefab = Resources.Load(spriteName);
+				if (numberPrefab != null) {
+					GameObject sprObj = (GameObject.Instantiate(numberPrefab, obj.transform.position + new Vector3(0f, 0f, 0.1f), rot)) as GameObject;
+					sprObj.transform.parent = obj.transform;
+				} else {
+					Debug.LogWarning("Could not load sprite: " + spriteName);
+				}
+
 				level++;
 			}
 		}
