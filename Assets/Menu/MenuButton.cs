@@ -13,6 +13,7 @@ public class MenuButton : MonoBehaviour {
 	bool pressed;
 	MenuLevelsController menuLevelsController;
 	MenuTouchController menuTouchController;
+	MainController mainController;
 
 	bool hitThisFrame = false;
 
@@ -22,6 +23,7 @@ public class MenuButton : MonoBehaviour {
 
 		menuLevelsController = (GameObject.Find("MenuLevelsController") as GameObject).GetComponent<MenuLevelsController>();
 		menuTouchController = (GameObject.Find("MenuTouchController") as GameObject).GetComponent<MenuTouchController>();
+		mainController = (GameObject.Find("MainController") as GameObject).GetComponent<MainController>();
 	}
 
 	public void SetLevelNumber(int levelNumber) {
@@ -90,6 +92,10 @@ public class MenuButton : MonoBehaviour {
 		case MenuButtonAction.ActionQuit:
 			menuCamera.SetMenuScreen(MenuScreen.Black);
 			menuCamera.SetBlackAction(BlackAction.Quit);
+			break;
+		case MenuButtonAction.ActionLevel:
+			// Play the level
+			mainController.PlayLevel(menuLevelsController.GetGameWorld(), levelNumber);
 			break;
 		case MenuButtonAction.WorldLawn:
 			menuLevelsController.SetGameWorld(GameWorld.Lawn);

@@ -1,8 +1,6 @@
 using UnityEngine;
 using System.Collections;
 
-public enum GameWorld {Lawn, Pinball, Sky, Space}
-
 public class MenuLevelsController : MonoBehaviour {
 
 	public GameObject prefabButtonlevel;
@@ -42,6 +40,10 @@ public class MenuLevelsController : MonoBehaviour {
 
 	public void SetGameWorld(GameWorld gameWorld) {
 		this.gameWorld = gameWorld;
+	}
+
+	public GameWorld GetGameWorld() {
+		return this.gameWorld;
 	}
 
 	public Color GetDesiredBackgroundColor() {

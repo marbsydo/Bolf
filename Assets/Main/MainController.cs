@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 
+public enum GameWorld {Lawn, Pinball, Sky, Space}
+
 public class MainController : MonoBehaviour {
 
 	void Awake() {
@@ -34,5 +36,30 @@ public class MainController : MonoBehaviour {
 
 		floorObj.transform.position = new Vector3(-7f, -12f, 1f);
 		*/
+	}
+
+	public void PlayLevel(GameWorld gameWorld, int levelNumber) {
+		// Check number is valid
+		if (IsValidLevelNumber(levelNumber)) {
+			//TODO: Might want to verify that the world is valid
+			Application.LoadLevel("level_" + GameWorldToString(gameWorld) + "_" + levelNumber);
+		} else {
+			Debug.LogWarning("Could not load level. Number is invalid: " + levelNumber);
+		}
+	}
+
+	public string GameWorldToString(GameWorld gameWorld) {
+		string s = "";
+		switch (gameWorld) {
+			case GameWorld.Lawn:	s = "lawn";		break;
+			case GameWorld.Pinball:	s = "pinball";	break;
+			case GameWorld.Sky:		s = "sky";		break;
+			case GameWorld.Space:	s = "space";	break;
+		}
+		return s;
+	}
+
+	public bool IsValidLevelNumber(int levelNumber) {
+		return (levelNumber >= 1 && levelNumber <= 18);
 	}
 }
