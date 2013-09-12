@@ -35,6 +35,8 @@ public class GUIButton : MonoBehaviour {
 				switch (buttonAction) {
 				case ButtonAction.Menu:
 					// Do menu stuff
+					//TODO: This should bring up a pause menu, but for now it can just go to the menu
+					Application.LoadLevel("menu");
 					break;
 				case ButtonAction.Retry:
 					// Retry level

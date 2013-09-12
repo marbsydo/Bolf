@@ -107,7 +107,7 @@ public class MenuCamera : MonoBehaviour {
 			break;
 		case BlackAction.PlayNextLevel:
 			// Play next level
-			Application.LoadLevel("level_1");
+			Application.LoadLevel("level_lawn_1");
 			goto case BlackAction.None;
 			break;
 		case BlackAction.Quit:
@@ -116,7 +116,11 @@ public class MenuCamera : MonoBehaviour {
 			break;
 		case BlackAction.PlaySpecificLevel:
 			// play the specific level
-			mainController.PlayLevel(this.specificLevel);
+			bool success = mainController.PlayLevel(this.specificLevel);
+			if (!success) {
+				SetMenuScreen(MenuScreen.Main);
+				Debug.LogError("Failed to play level");
+			}
 			break;
 		}
 	}

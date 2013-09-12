@@ -49,14 +49,27 @@ public class MainController : MonoBehaviour {
 		*/
 	}
 
-	public void PlayLevel(SpecificLevel specificLevel) {
+	// Returns true on success
+	public bool PlayLevel(SpecificLevel specificLevel) {
+		bool success = true;
 		// Check number is valid
 		if (IsValidLevelNumber(specificLevel.levelNumber)) {
 			//TODO: Might want to verify that the world is valid
 			Application.LoadLevel("level_" + GameWorldToString(specificLevel.gameWorld) + "_" + specificLevel.levelNumber);
+
+			//NOTE: This method of catching errors shouldn't be relied upon in production
+			// however there is no proper way of checking whether a level exists before loading it
+			// thus it is impossible to avoid an error when attempting to load a level that does not exist
+			if (!Application.isLoadingLevel) {
+				Debug.LogWarning("Level does not appear to exist!");
+				success = false;
+			}
 		} else {
 			Debug.LogWarning("Could not load level. Number is invalid: " + specificLevel.levelNumber);
+			success = false;
 		}
+
+		return success;
 	}
 
 	public string GameWorldToString(GameWorld gameWorld) {
