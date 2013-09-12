@@ -12,6 +12,8 @@ public class MenuButton : MonoBehaviour {
 	bool pressed;
 	MenuLevelsController menuLevelsController;
 
+	bool hitThisFrame = false;
+
 	void Awake() {
 		cam = (GameObject.Find("MenuCamera") as GameObject).GetComponent<Camera>() as Camera;
 		menuCamera = cam.gameObject.GetComponent<MenuCamera>();
@@ -94,6 +96,19 @@ public class MenuButton : MonoBehaviour {
 		}
 	}
 
+	public void HitThisFrame() {
+		hitThisFrame = true;
+	}
+
+	void LateUpdate() {
+		hitThisFrame = false;
+	}
+
+	bool TouchOverButton() {
+		return hitThisFrame;
+	}
+
+	/*
 	// TODO: this function is awful because every single button in the scene calls it!!!
 	// It should ideally just be called once and a message passed on to the relevant button that is has been clicked
 	bool TouchOverButton() {
@@ -113,4 +128,5 @@ public class MenuButton : MonoBehaviour {
 
 		return touchOverButton;
 	}
+	*/
 }
