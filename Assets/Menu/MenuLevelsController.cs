@@ -50,16 +50,20 @@ public class MenuLevelsController : MonoBehaviour {
 		Color c;
 		switch (this.gameWorld) {
 		case GameWorld.Lawn:
-			c = new Color(0.33203f, 0.71875f, 0.18750f);
+			//c = new Color(0.33203f, 0.71875f, 0.18750f);
+			c = new Color(38f/255f, 128f/255f, 38f/255f);
 			break;
 		case GameWorld.Pinball:
-			c = new Color(0.11764f, 0.45490f, 0.61176f);
+			//c = new Color(0.11764f, 0.45490f, 0.61176f);
+			c = new Color(182f/255f, 148f/255f, 31f/255f);
 			break;
 		case GameWorld.Sky:
-			c = new Color(0.50588f, 1.00000f, 0.92941f);
+			//c = new Color(0.50588f, 1.00000f, 0.92941f);
+			c = new Color(58f/255f, 111f/255f, 203f/255f);
 			break;
 		case GameWorld.Space:
-			c = new Color(0.75294f, 1.00000f, 0.04705f);
+			//c = new Color(0.75294f, 1.00000f, 0.04705f);
+			c = new Color(44f/255f, 11f/255f, 85f/255f);
 			break;
 		default:
 			Debug.LogWarning("Unknown gameWorld " + gameWorld);
