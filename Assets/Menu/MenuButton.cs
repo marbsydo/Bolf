@@ -12,6 +12,7 @@ public class MenuButton : MonoBehaviour {
 	MenuCamera menuCamera;
 	bool pressed;
 	MenuLevelsController menuLevelsController;
+	MenuTouchController menuTouchController;
 
 	bool hitThisFrame = false;
 
@@ -20,6 +21,7 @@ public class MenuButton : MonoBehaviour {
 		menuCamera = cam.gameObject.GetComponent<MenuCamera>();
 
 		menuLevelsController = (GameObject.Find("MenuLevelsController") as GameObject).GetComponent<MenuLevelsController>();
+		menuTouchController = (GameObject.Find("MenuTouchController") as GameObject).GetComponent<MenuTouchController>();
 	}
 
 	public void SetLevelNumber(int levelNumber) {
@@ -32,17 +34,17 @@ public class MenuButton : MonoBehaviour {
 
 	void Update() {
 
-		bool wasHitThisFrame = WasHitThisFrame();
+		bool touchOverButton = TouchOverButton();
 
 		if (Input.GetMouseButtonDown(0)) {
-			if (wasHitThisFrame) {
+			if (touchOverButton) {
 				// Player has pressed down on the button
 				pressed = true;
 			}
 		}
 
 		if (pressed) {
-			if (!wasHitThisFrame) {
+			if (!touchOverButton) {
 				// Touch has moved off button
 				pressed = false;
 			}
@@ -122,31 +124,15 @@ public class MenuButton : MonoBehaviour {
 		return wasHit;
 	}
 
-	/*
 	bool TouchOverButton() {
-		return hitThisFrame;
-	}
-	*/
-
-	/*
-	// TODO: this function is awful because every single button in the scene calls it!!!
-	// It should ideally just be called once and a message passed on to the relevant button that is has been clicked
-	bool TouchOverButton() {
-		// Raycast and see if the mouse is over the button
-		Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-		Debug.DrawRay(ray.origin, ray.direction * 20, Color.yellow);
-
 		bool touchOverButton = false;
-
-		RaycastHit hit;
-		if (Physics.Raycast(ray, out hit)) {
-			if (hit.collider != null) {
-				// really terrible code
-				touchOverButton = (hit.collider.name == gameObject.name);
+		if (menuTouchController.TouchExists()) {
+			Collider collider = menuTouchController.TouchCollider();
+			// Am I the one being hit?
+			if (collider.name == gameObject.name) {
+				touchOverButton = true;
 			}
 		}
-
 		return touchOverButton;
 	}
-	*/
 }

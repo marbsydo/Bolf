@@ -5,15 +5,23 @@ public class MenuTouchController : MonoBehaviour {
 
 	Camera cam;
 
+	bool touchExists;
+	Collider touchCollider;
+
 	void Awake() {
 		cam = (GameObject.Find("MenuCamera") as GameObject).GetComponent<Camera>() as Camera;
 	}
 
 	void Update() {
-		PerformTouchRaycast();
+		if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0) || Input.GetMouseButtonUp(0)) {
+			PerformTouchRaycast();
+		}
 	}
 
 	void PerformTouchRaycast() {
+
+		touchExists = false;
+
 		// Raycast and see which collider is hit
 		Ray ray = cam.ScreenPointToRay(Input.mousePosition);
 		Debug.DrawRay(ray.origin, ray.direction * 20, Color.yellow);
@@ -23,17 +31,17 @@ public class MenuTouchController : MonoBehaviour {
 		RaycastHit hit;
 		if (Physics.Raycast(ray, out hit)) {
 			if (hit.collider != null) {
-				// A collider is being hit
-				TellColliderTheyAreHit(hit.collider);
+				touchExists = true;
+				touchCollider = hit.collider;
 			}
 		}
 	}
 
-	void TellColliderTheyAreHit(Collider collider) {
-		MenuButton menuButton = collider.gameObject.GetComponent<MenuButton>() as MenuButton;
-		if (menuButton != null) {
-			//Debug.Log("Telling " + collider.gameObject.name + "! " + Random.value);
-			menuButton.HitThisFrame();
-		}
+	public bool TouchExists() {
+		return touchExists;
+	}
+
+	public Collider TouchCollider() {
+		return touchCollider;
 	}
 }
