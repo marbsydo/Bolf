@@ -103,6 +103,7 @@ public class MenuCamera : MonoBehaviour {
 			break;
 		case BlackAction.Play:
 			// Play next level
+			Application.LoadLevel("level_1");
 			goto case BlackAction.None;
 			break;
 		case BlackAction.Quit:

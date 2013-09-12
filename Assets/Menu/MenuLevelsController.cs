@@ -10,10 +10,16 @@ public class MenuLevelsController : MonoBehaviour {
 	GameWorld gameWorld = GameWorld.Lawn;
 
 	void Awake() {
-		Vector3 middle =  transform.position + new Vector3(-2f, -2f, 0f);
-		for (int j = 0; j < 8; j++) {
-			for (int i = 0; i < 3; i++) {
-				GameObject.Instantiate(prefabButtonlevel, middle + new Vector3(i * 2f, j * 1.2f, 0f), Quaternion.identity);
+		Vector3 middle =  transform.position + new Vector3(3f, 4f, 0f);
+		int level = 1;
+		
+		// rows of 4 3 4 3 4
+		for (int row = 0; row < 5; row++) {
+			int colSize = 3 + (1 - (row % 2));
+			for (int col = 0; col < colSize; col++) {
+				GameObject obj = GameObject.Instantiate(prefabButtonlevel, middle + new Vector3(col * -2f + (colSize == 3 ? -1f : 0f), row * -1.5f, 0f), Quaternion.Euler(180f, 0f, 0f)) as GameObject;
+				obj.name = "Level" + level;
+				level++;
 			}
 		}
 	}
