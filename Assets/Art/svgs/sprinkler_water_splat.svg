@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="32"
+   height="32"
+   id="svg3762"
+   version="1.1"
+   inkscape:version="0.48.2 r9819"
+   sodipodi:docname="sprinkler_water_splat.svg"
+   inkscape:export-filename="C:\Users\Muffin\Documents\GitHub\Bolf\Assets\Art\GameAtlas\sprinkler_water_splat.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
+  <defs
+     id="defs3764" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="15.839192"
+     inkscape:cx="19.357749"
+     inkscape:cy="13.116819"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1680"
+     inkscape:window-height="988"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata3767">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-1020.3622)">
+    <path
+       style="fill:#1f5394;fill-opacity:1;stroke:#0f2949;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 4.9244937,1037.9044 c -1.616849,3.8027 -4.16084634,6.3826 -1.1995561,9.3439 4.0641828,4.0642 8.3610254,-4.2027 10.9854094,-1.5784 0.716305,0.7163 5.544487,5.7566 7.134202,4.1669 3.861305,-3.8613 -0.426803,-9.3047 1.641498,-9.7858 10.777616,-2.507 6.229798,-10.3115 -1.010148,-10.1016 -3.726836,0.1081 -0.479734,-5.8272 -4.230019,-7.7024 -3.257309,-1.6286 -4.280162,5.2653 -6.250318,6.2503 -3.6965254,1.8483 -7.2237062,-2.5989 -8.9019698,0.7577 -2.27439444,4.5487 3.5072876,3.9161 1.8309015,8.6494 z"
+       id="path3776"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cssssssssc" />
+    <path
+       style="fill:#ffffff;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:0.1254902"
+       d="m 5.0507627,22.908627 8.0812203,-6.81853 -8.1443548,-4.73509 9.2492088,2.462247 2.998891,-9.7227181 -0.0947,9.9752561 9.659582,-0.315672 -9.438613,2.841054 3.440832,10.038391 -5.77681,-8.712566 z"
+       id="path4304"
+       inkscape:connector-curvature="0"
+       transform="translate(0,1020.3622)" />
+  </g>
+</svg>
