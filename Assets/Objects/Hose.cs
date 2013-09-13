@@ -6,7 +6,7 @@ public class Hose : MonoBehaviour {
 
 	bool gotWater = true;
 
-	WaterJet waterJet = new WaterJet(8f, 50f);
+	WaterJet waterJet = new WaterJet(8f, 200f, true);
 
 	void Awake() {
 		waterJet.Init();

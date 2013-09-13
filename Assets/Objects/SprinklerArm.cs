@@ -5,7 +5,7 @@ public class SprinklerArm : MonoBehaviour {
 
 	public int angleOffset;
 
-	WaterJet waterJet = new WaterJet(8f, 30f);
+	WaterJet waterJet = new WaterJet(8f, 30f, false);
 
 	void Awake() {
 		waterJet.Init();
@@ -21,15 +21,17 @@ public class SprinklerArm : MonoBehaviour {
 
 public class WaterJet {
 
-	float maxDistance;
-	float jetForce;
+	float maxDistance; // How far the jet reaches
+	float jetForce;    // The force the jet applies
+	bool increasing;   // If true, the force increases linearly closer to the source of the jet
 
 	GameObject waterJet;
 	GameObject waterSplash;
 
-	public WaterJet(float maxDistance, float jetForce) {
+	public WaterJet(float maxDistance, float jetForce, bool increasing) {
 		this.maxDistance = maxDistance;
 		this.jetForce = jetForce;
+		this.increasing = increasing;
 	}
 
 	public void Init() {
@@ -52,7 +54,12 @@ public class WaterJet {
 			if (hit.collider != null) {
 				if (hit.collider.gameObject.rigidbody != null) {
 					// Apply a force to what we hit
-					hit.collider.gameObject.rigidbody.AddForce(jetVector * jetForce, ForceMode.Acceleration);
+					float appliedForce = jetForce;
+					if (increasing) {
+						// Scale linearly, so it is more powerful when the distance is shorter
+						appliedForce = jetForce - (jetForce / maxDistance * rayDistance);
+					}
+					hit.collider.gameObject.rigidbody.AddForce(jetVector * appliedForce, ForceMode.Acceleration);
 				}
 			}
 		}
