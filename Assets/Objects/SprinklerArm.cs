@@ -3,26 +3,46 @@ using System.Collections;
 
 public class SprinklerArm : MonoBehaviour {
 
-	float maxDistance = 8f;
-	float sprinkleForce = 30f;
-
 	public int angleOffset;
 
-	GameObject waterJet;
-	GameObject waterSplash;
+	WaterJet waterJet = new WaterJet(8f, 30f);
 
 	void Awake() {
-		waterJet = GameObject.Instantiate(Resources.Load("Sprites/WaterJetSprite") as Object, transform.position, Quaternion.identity) as GameObject;
-		waterSplash = GameObject.Instantiate(Resources.Load("Sprites/WaterSplashSprite") as Object, transform.position, Quaternion.identity) as GameObject;
+		waterJet.Init();
 	}
 
 	void Update() {
 		float angle = angleOffset + transform.parent.eulerAngles.z;
-		Vector3 sprinkleVector = (new Vector3(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad), 0f)).normalized;
-		// sprinkleVector is a normalized vector pointing out from the end of the sprinkler's arm
-		//Debug.DrawLine(transform.position, transform.position + sprinkleVector, Color.red);
+		Vector3 jetOrigin = transform.position;
+		Vector3 jetVector = waterJet.EulerAngleToNormalizedVector(angle);
+		waterJet.Spray(jetOrigin, jetVector);
+	}
+}
 
-		Ray ray = new Ray(transform.position, sprinkleVector);
+public class WaterJet {
+
+	float maxDistance;
+	float jetForce;
+
+	GameObject waterJet;
+	GameObject waterSplash;
+
+	public WaterJet(float maxDistance, float jetForce) {
+		this.maxDistance = maxDistance;
+		this.jetForce = jetForce;
+	}
+
+	public void Init() {
+		waterJet = GameObject.Instantiate(Resources.Load("Sprites/WaterJetSprite") as Object, Vector3.zero, Quaternion.identity) as GameObject;
+		waterSplash = GameObject.Instantiate(Resources.Load("Sprites/WaterSplashSprite") as Object, Vector3.zero, Quaternion.identity) as GameObject;
+	}
+
+	public Vector3 EulerAngleToNormalizedVector(float angle) {
+		return (new Vector3(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad), 0f)).normalized;
+	}
+
+	public void Spray(Vector3 jetOrigin, Vector3 jetVector) {
+		Ray ray = new Ray(jetOrigin, jetVector);
 		
 		float rayDistance = maxDistance;
 
@@ -32,7 +52,7 @@ public class SprinklerArm : MonoBehaviour {
 			if (hit.collider != null) {
 				if (hit.collider.gameObject.rigidbody != null) {
 					// Apply a force to what we hit
-					hit.collider.gameObject.rigidbody.AddForce(sprinkleVector * sprinkleForce, ForceMode.Acceleration);
+					hit.collider.gameObject.rigidbody.AddForce(jetVector * jetForce, ForceMode.Acceleration);
 				}
 			}
 		}
@@ -40,14 +60,18 @@ public class SprinklerArm : MonoBehaviour {
 		Debug.DrawRay(ray.origin, ray.direction * rayDistance, Color.red);
 
 		// Update the jet sprite
-		Vector3 midPoint = (ray.origin + (ray.direction * rayDistance / 2));
-		waterJet.transform.position = midPoint + new Vector3(0f, 0f, 0.1f);
-		waterJet.transform.eulerAngles = new Vector3(0f, 0f, angle);
-		waterJet.transform.localScale = new Vector3(rayDistance * 2f, 1f, 1f);
+		if (waterJet != null) {
+			Vector3 midPoint = (ray.origin + (ray.direction * rayDistance / 2));
+			waterJet.transform.position = midPoint + new Vector3(0f, 0f, 0.1f);
+			waterJet.transform.eulerAngles = new Vector3(0f, 0f, Mathf.Atan2(jetVector.y, jetVector.x) * Mathf.Rad2Deg);
+			waterJet.transform.localScale = new Vector3(rayDistance * 2f, 1f, 1f);
+		}
 
 		// Update the splash sprite
-		Vector3 endPoint = (ray.origin + ray.direction * rayDistance);
-		waterSplash.transform.position = endPoint + new Vector3(0f, 0f, 0.05f);
-		waterSplash.transform.eulerAngles = new Vector3(0f, 0f, Time.timeSinceLevelLoad * 400f);
+		if (waterSplash != null) {
+			Vector3 endPoint = (ray.origin + ray.direction * rayDistance);
+			waterSplash.transform.position = endPoint + new Vector3(0f, 0f, 0.05f);
+			waterSplash.transform.eulerAngles = new Vector3(0f, 0f, Time.timeSinceLevelLoad * 400f);
+		}
 	}
 }
