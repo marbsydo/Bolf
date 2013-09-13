@@ -26,10 +26,10 @@ public class GUIScore : MonoBehaviour {
 
 	int GetPar(string levelName) {
 		int par = 1;
-		if (levelName == "level_1") {
+		if (levelName == "level_lawn_1") {
 			par = 1;
-		} else if (levelName == "level_2") {
-			par = 2;
+		} else if (levelName == "level_lawn_2") {
+			par = 3;
 		} else {
 			Debug.LogWarning("Unknown level: " + levelName);
 		}
