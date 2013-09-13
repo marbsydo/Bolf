@@ -31,6 +31,7 @@ public class Hose : MonoBehaviour {
 
 		Quaternion rot = Quaternion.Euler(0f, 0f, transform.eulerAngles.z);
 
+		// Create all the bulges in a line leading out from the hose
 		for (int i = 0; i < bulges.Length; i++) {
 			float offset = i * spacing;
 			bulges[i] = GameObject.Instantiate(bulgePrefab, transform.position + spacingVector * i, rot) as GameObject;
@@ -38,6 +39,12 @@ public class Hose : MonoBehaviour {
 	}
 
 	void Update() {
+
+		// Overview:
+		// Move all of the bulges towards the hose
+		// If a bulge has moved too far, move it back to the end of the line
+		// The end of the line is found by finding the Furthest() away bulge
+
 		float step = speed * -Time.deltaTime;
 		Vector3 bulgeStep = new Vector3(step * angleCos, step * angleSin, 0f);
 
@@ -48,6 +55,10 @@ public class Hose : MonoBehaviour {
 
 			Vector3 vectorToHoseNormalized = (transform.position - bulges[i].transform.position).normalized;
 
+			// This function essentially checks whether the bulge has travelled beyond the hose
+			// The logic is as follows:
+			// If the direction FROM the hose TO the bulge is the same as the direction the bulge is travelling in, it has gone too far
+			// Comparing the direction is then done in a hacky way by normalizing the vectors and checking if they are similar. It's good enough.
 			if (ApproximatelyEqual(vectorToHoseNormalized, spacingVectorNormalized)) {
 				bulges[i].transform.position = furthest.transform.position + spacingVector;
 			}
