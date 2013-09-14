@@ -6,7 +6,7 @@ public class Nozzle : MonoBehaviour {
 	public Hose hose;
 
 	const float maxDistance = 8f;
-	const float maxForce = 200f;
+	const float maxForce = 800f;
 	float currentDistance = maxDistance;
 	float currentForce = maxForce;
 
@@ -41,7 +41,7 @@ public class Nozzle : MonoBehaviour {
 		if (ball != null) {
 			// Rotate towards the ball
 			float angle = Mathf.Atan2(ball.transform.position.y - transform.position.y, ball.transform.position.x - transform.position.x) * Mathf.Rad2Deg;
-			transform.eulerAngles = new Vector3(0f, 0f, Mathf.MoveTowardsAngle(transform.eulerAngles.z, angle, Time.deltaTime * 100f));
+			transform.eulerAngles = new Vector3(0f, 0f, Mathf.MoveTowardsAngle(transform.eulerAngles.z, angle, Time.deltaTime * 200f));
 			//transform.eulerAngles = new Vector3(0f, 0f, angle);
 
 			// Spray the ball

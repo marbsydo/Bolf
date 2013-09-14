@@ -40,7 +40,8 @@ public class GUIButton : MonoBehaviour {
 					break;
 				case ButtonAction.Retry:
 					// Retry level
-					((GameObject.Find("GameControls") as GameObject).GetComponent<GameControls>() as GameControls).ResetAll();
+					//((GameObject.Find("GameControls") as GameObject).GetComponent<GameControls>() as GameControls).ResetAll();
+					Application.LoadLevel(Application.loadedLevelName);
 					break;
 				}
 				pressed = false;
