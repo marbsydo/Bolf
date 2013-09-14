@@ -30,11 +30,12 @@ public class GameControls : MonoBehaviour {
 		GameObject temp = GameObject.Find("Ball") as GameObject;
 		if (temp != null) {
 			ballStartPosition = temp.transform.position;
+			ball = temp.GetComponent<Ball>() as Ball;
 		} else {
-			Debug.LogWarning("No ball in scene");
+			Debug.LogError("No ball in scene");
 			ballStartPosition = Vector3.zero;
 		}
-		Destroy(temp);
+		
 	}
 
 	void Start() {
@@ -105,9 +106,29 @@ public class GameControls : MonoBehaviour {
 		guiScore.ResetStrokes();
 	}
 
+/*
 	void ResetBall() {
+		// Create the new ball
+		Ball newBall = (Instantiate(ballPrefab, ballStartPosition, Quaternion.identity) as GameObject).GetComponent<Ball>();
+		newBall.name = "Ball";
+
+		// Tell it not to collide with the old ball
+		Physics.IgnoreCollision(newBall.gameObject.collider, ball.gameObject.collider);
+
+		// Destroy the old ball
+		Destroy(ball.gameObject);
+
+		ball = newBall;
+
+		ballStage = BallStage.AwaitingRelease;
+	}
+*/
+
+	void ResetBall() {
+		Ball oldBall = ball;
 		DestroyBall();
 		CreateBall(ballStartPosition);
+		Physics.IgnoreCollision(oldBall.collider, ball.collider);
 	}
 
 	void CreateBall(Vector3 p) {
@@ -126,7 +147,9 @@ public class GameControls : MonoBehaviour {
 			ballStage = BallStage.DoesNotExist;
 		}
 	}
+	
 }
+
 
 public class TouchInput {
 
