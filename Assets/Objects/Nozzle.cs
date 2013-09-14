@@ -29,7 +29,7 @@ public class Nozzle : MonoBehaviour {
 			currentDistance = Mathf.Lerp(currentDistance, maxDistance, lerpTime);
 			currentForce = Mathf.Lerp(currentForce, maxForce, lerpTime);
 		}  else {
-			currentDistance = Mathf.Lerp(currentDistance, 1f, lerpTime);
+			currentDistance = Mathf.Lerp(currentDistance, 0.5f, lerpTime);
 			currentForce = Mathf.Lerp(currentForce, 5f, lerpTime);
 			//currentDistance -= Time.deltaTime * 1f;
 			//currentForce -= Time.deltaTime * 2f;
@@ -41,11 +41,12 @@ public class Nozzle : MonoBehaviour {
 		if (ball != null) {
 			// Rotate towards the ball
 			float angle = Mathf.Atan2(ball.transform.position.y - transform.position.y, ball.transform.position.x - transform.position.x) * Mathf.Rad2Deg;
-			transform.eulerAngles = new Vector3(0f, 0f, angle);
+			transform.eulerAngles = new Vector3(0f, 0f, Mathf.MoveTowardsAngle(transform.eulerAngles.z, angle, Time.deltaTime * 100f));
+			//transform.eulerAngles = new Vector3(0f, 0f, angle);
 
 			// Spray the ball
 			Vector3 jetOrigin;
-			Vector3 jetVector = waterJet.EulerAngleToNormalizedVector(angle);
+			Vector3 jetVector = waterJet.EulerAngleToNormalizedVector(transform.eulerAngles.z);
 			jetOrigin = transform.position + jetVector * 0.5f;
 			waterJet.Spray(jetOrigin, jetVector);
 		}
