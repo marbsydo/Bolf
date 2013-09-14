@@ -34,6 +34,14 @@ public class WaterJet {
 		this.increasing = increasing;
 	}
 
+	public void SetMaxDistance(float maxDistance) {
+		this.maxDistance = maxDistance;
+	}
+
+	public void SetMaxForce(float jetForce) {
+		this.jetForce = jetForce;
+	}
+
 	public void Init() {
 		waterJet = GameObject.Instantiate(Resources.Load("Sprites/WaterJetSprite") as Object, Vector3.zero, Quaternion.identity) as GameObject;
 		waterSplash = GameObject.Instantiate(Resources.Load("Sprites/WaterSplashSprite") as Object, Vector3.zero, Quaternion.identity) as GameObject;

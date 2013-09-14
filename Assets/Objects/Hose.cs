@@ -18,6 +18,12 @@ public class Hose : MonoBehaviour {
 
 	HoseBulge[] bulges;
 
+	float timeOfLastBulge = 0f;
+
+	public float GetTimeOfLastBulge() {
+		return timeOfLastBulge;
+	}
+
 	void Awake() {
 		Object bulgePrefab = Resources.Load("Secondary/HoseBulge");
 		bulges = new HoseBulge[numBulges];
@@ -62,7 +68,11 @@ public class Hose : MonoBehaviour {
 			// If the direction FROM the hose TO the bulge is the same as the direction the bulge is travelling in, it has gone too far
 			// Comparing the direction is then done in a hacky way by normalizing the vectors and checking if they are similar. It's good enough.
 			if (ApproximatelyEqual(vectorToHoseNormalized, spacingVectorNormalized)) {
+				// Move the bulge back to the end of the line
 				bulges[i].transform.position = furthest.transform.position + spacingVector;
+
+				// Record the time at which this occurs
+				timeOfLastBulge = Time.timeSinceLevelLoad;
 			}
 		}
 	}
