@@ -5,7 +5,7 @@ public class Hose : MonoBehaviour {
 
 	// You can change these three:
 	const int numBulges = 10; // How many bulges to make
-	const float spacing = 2f; // How far apart they are spread
+	const float spacing = 1.5f; // How far apart they are spread
 	const float speed = 3f;   // Speed the bulges move at
 
 	// Do not set these
@@ -16,11 +16,11 @@ public class Hose : MonoBehaviour {
 	Vector3 spacingVector;
 	Vector3 spacingVectorNormalized;
 
-	GameObject[] bulges;
+	HoseBulge[] bulges;
 
 	void Awake() {
-		Object bulgePrefab = Resources.Load("Sprites/HoseBulgeSprite");
-		bulges = new GameObject[numBulges];
+		Object bulgePrefab = Resources.Load("Secondary/HoseBulge");
+		bulges = new HoseBulge[numBulges];
 
 		angle = transform.eulerAngles.z * Mathf.Deg2Rad;
 		angleCos = Mathf.Cos(angle);
@@ -34,7 +34,7 @@ public class Hose : MonoBehaviour {
 		// Create all the bulges in a line leading out from the hose
 		for (int i = 0; i < bulges.Length; i++) {
 			float offset = i * spacing;
-			bulges[i] = GameObject.Instantiate(bulgePrefab, transform.position + spacingVector * i, rot) as GameObject;
+			bulges[i] = (GameObject.Instantiate(bulgePrefab, transform.position + spacingVector * i, rot) as GameObject).GetComponent<HoseBulge>() as HoseBulge;
 		}
 	}
 
@@ -51,7 +51,9 @@ public class Hose : MonoBehaviour {
 		GameObject furthest = Furthest();
 
 		for (int i = 0; i < bulges.Length; i++) {
-			bulges[i].transform.position += bulgeStep;
+			// Check the bulge is not hitting something
+			if (!bulges[i].GetColliding())
+				bulges[i].transform.position += bulgeStep;
 
 			Vector3 vectorToHoseNormalized = (transform.position - bulges[i].transform.position).normalized;
 
@@ -77,12 +79,12 @@ public class Hose : MonoBehaviour {
 
 	GameObject Furthest() {
 		float dis = -1f;
-		GameObject furthest = bulges[0];
+		GameObject furthest = bulges[0].gameObject;
 		for (int i = 0; i < bulges.Length; i++) {
 			float disTemp = (transform.position - bulges[i].transform.position).sqrMagnitude;
 			if (disTemp > dis) {
 				dis = disTemp;
-				furthest = bulges[i];
+				furthest = bulges[i].gameObject;
 			}
 		}
 		return furthest;

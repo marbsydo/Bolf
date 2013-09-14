@@ -49,17 +49,21 @@ public class WaterJet {
 		float rayDistance = maxDistance;
 
 		RaycastHit hit;
-		if (Physics.Raycast(ray, out hit, maxDistance)) {
+		int layerMask = ~(1 << 11);	// Hit all layers except layer 11 (layer 11 is the NoJetCollider layer)
+		if (Physics.Raycast(ray, out hit, maxDistance, layerMask)) {
 			rayDistance = hit.distance;
 			if (hit.collider != null) {
 				if (hit.collider.gameObject.rigidbody != null) {
-					// Apply a force to what we hit
-					float appliedForce = jetForce;
-					if (increasing) {
-						// Scale linearly, so it is more powerful when the distance is shorter
-						appliedForce = jetForce - (jetForce / maxDistance * rayDistance);
+					// Check if it is the sort of rigidbody we should hit
+					if (hit.collider.gameObject.rigidbody.CompareTag("DynamicObject") || hit.collider.gameObject.rigidbody.CompareTag("Ball")) {
+						// Apply a force to what we hit
+						float appliedForce = jetForce;
+						if (increasing) {
+							// Scale linearly, so it is more powerful when the distance is shorter
+							appliedForce = jetForce - (jetForce / maxDistance * rayDistance);
+						}
+						hit.collider.gameObject.rigidbody.AddForce(jetVector * appliedForce, ForceMode.Acceleration);
 					}
-					hit.collider.gameObject.rigidbody.AddForce(jetVector * appliedForce, ForceMode.Acceleration);
 				}
 			}
 		}
